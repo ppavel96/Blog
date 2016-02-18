@@ -1,0 +1,28 @@
+body {
+    background-color: #202020;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 16px;
+}
+
+.navbar-blog {
+    background-color: #000000;
+    border-color: #000000;
+
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.navbar-blog * {
+    margin-left: initial;
+    margin-right: initial;
+}
+
+.navbar-blog .navbar-toggle {
+    margin-right: 2%;
+}
+
+.navbar-blog .navbar-nav>.active>a,
+.navbar-blog .navbar-nav>.active>a:focus,
+.navbar-blog .navbar-nav>.active>a:hover {
+    color: #00ff00;
+}
