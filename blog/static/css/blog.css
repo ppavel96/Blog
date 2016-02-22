@@ -1,28 +1,65 @@
 body {
     background-color: #202020;
+    
+    min-width: 1024px;
+    min-height: 100%;
+    
+    text-align: left;
     font-family: "Comic Sans MS", cursive, sans-serif;
     font-size: 16px;
+    
+    position: relative;
+    padding: 0;
+    margin: 0;
 }
 
-.navbar-blog {
+.navbar {
     background-color: #000000;
     border-color: #000000;
 
-    margin-left: 2%;
-    margin-right: 2%;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
-.navbar-blog * {
+.navbar-second {
+    margin-top: 15px;
+}
+
+.navbar-menu {
+    display: table;
+    padding-left: 20px;
+}
+
+.navbar-item {
+    display: table-cell;
+    vertical-align: middle;
+    
+    min-width: 90px;
+    height: 30px;
+}
+
+.navbar * {
     margin-left: initial;
     margin-right: initial;
+    margin-top: initial;
 }
 
-.navbar-blog .navbar-toggle {
-    margin-right: 2%;
+.two-third-width {
+    width: 66%;
 }
 
-.navbar-blog .navbar-nav>.active>a,
-.navbar-blog .navbar-nav>.active>a:focus,
-.navbar-blog .navbar-nav>.active>a:hover {
+a {
+    color: #666666;
+    text-decoration: none;
+}
+
+a:focus,
+a:hover {
+    color: #ffffff;
+}
+
+.active>a,
+.active>a:focus,
+.active>a:hover {
     color: #00ff00;
 }

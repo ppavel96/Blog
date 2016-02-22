@@ -1,0 +1,29 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div>
+        <nav class="navbar" role="navigation">
+            <ul class="navbar-menu">
+                <li class="navbar-item" id="posts-link"><a href="posts">Посты</a></li>
+                <li class="navbar-item" id="blogs-link"><a href="blogs">Блоги</a></li>
+                <li class="navbar-item" id="people-link"><a href="people">Люди</a></li>
+                <li class="navbar-item" id="about-link"><a href="about">О проекте</a></li>
+            </ul>
+        </nav>
+
+        <div class="two-third-width">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

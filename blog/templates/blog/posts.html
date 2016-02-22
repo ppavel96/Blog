@@ -1,0 +1,22 @@
+﻿{% extends "blog/base.html" %}
+
+{% block title %}Посты{% endblock %}
+
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+        $("#posts-link").addClass('active');
+    });
+</script>
+
+<nav class="navbar two-third-width" role="navigation">
+    <ul class="navbar-menu">
+        <li class="navbar-item"><a href="posts">Горячее</a></li>
+        <li class="navbar-item"><a href="posts">Новое</a></li>
+        <li class="navbar-item"><a href="posts">Лучшее</a></li>
+        <li class="navbar-item"><a href="posts">По подписке</a></li>
+    </ul>
+</nav>
+
+{% endblock %}
