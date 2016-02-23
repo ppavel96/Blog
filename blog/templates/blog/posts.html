@@ -1,22 +1,15 @@
 ﻿{% extends "blog/base.html" %}
 
-{% block title %}
-
-{% if category == 'hot' %} Горячее {% endif %}
-{% if category == 'new' %} Новое {% endif %}
-{% if category == 'best' %} Лучшее {% endif %}
-{% if category == 'feed' %} По подписке {% endif %}
-
-{% endblock %}
+{% block title %}{% if category == 'hot' %}Горячее{% endif %}{% if category == 'new' %}Новое{% endif %}{% if category == 'best' %}Лучшее{% endif %}{% if category == 'feed' %}По подписке{% endif %}{% endblock %}
 
 {% block content %}
 
-<nav class="content navbar-menu" role="navigation">
+<nav class="content content-header" role="navigation">
     <ul>
-        <li class="navbar-item {% if category == 'hot' %}active{% endif %}"><a href="/posts/hot">Горячее</a></li>
-        <li class="navbar-item {% if category == 'new' %}active{% endif %}"><a href="/posts/new">Новое</a></li>
-        <li class="navbar-item {% if category == 'best' %}active{% endif %}"><a href="/posts/best">Лучшее</a></li>
-        <li class="navbar-item {% if category == 'feed' %}active{% endif %}"><a href="/posts/feed">По подписке</a></li>
+        <li class="content-header-item {% if category == 'hot' %}active{% endif %}"><a href="/posts/hot">Горячее</a></li>
+        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/posts/new">Новое</a></li>
+        <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/posts/best">Лучшее</a></li>
+        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/posts/feed">По подписке</a></li>
     </ul>
 </nav>
 

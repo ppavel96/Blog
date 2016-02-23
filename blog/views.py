@@ -12,3 +12,5 @@ def blogs(request):
 def about(request):
     return render(request, 'blog/about.html', { 'navigation' : 'about' })
 
+def page_404(request):
+    return render(request, 'blog/404.html', { 'navigation' : '404' })

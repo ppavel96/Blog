@@ -11,16 +11,17 @@
 
     <link rel="stylesheet" href="{% static 'css/blog.css' %}">
     <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
+    <link rel="author" href="/humans.txt" />
 </head>
 
 <body>
     <div>
         <nav class="content" role="navigation">
-            <ul class="navbar-menu">
-                <li class="navbar-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts">Посты</a></li>
-                <li class="navbar-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs">Блоги</a></li>
-                <li class="navbar-item {% if navigation == 'people' %}active{% endif %}"><a href="/people">Люди</a></li>
-                <li class="navbar-item {% if navigation == 'about' %}active{% endif %}"><a href="/about">О проекте</a></li>
+            <ul class="content-header">
+                <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts">Посты</a></li>
+                <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs">Блоги</a></li>
+                <li class="content-header-item {% if navigation == 'people' %}active{% endif %}"><a href="/people">Люди</a></li>
+                <li class="content-header-item {% if navigation == 'about' %}active{% endif %}"><a href="/about">О проекте</a></li>
             </ul>
         </nav>
 
@@ -31,10 +32,8 @@
 
             <div class="content-right">
                 <div>
-                    <div class="content content-name">
-                        <h3 class="navbar-item">
-                            Популярные теги
-                        </h3>
+                    <div class="content content-header">
+                        <p class="content-header-item">Популярные теги</p>
                     </div>
 
                     <div class="content height-300">
@@ -43,10 +42,8 @@
                 </div>
                 
                 <div class="indent-needed">
-                    <div class="content content-name">
-                        <h3 class="navbar-item">
-                            Реклама
-                        </h3>
+                    <div class="content content-header">
+                        <p class="content-header-item">Реклама</p>
                     </div>
 
                     <div class="content height-300">
