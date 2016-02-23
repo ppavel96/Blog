@@ -13,4 +13,6 @@ def about(request):
     return render(request, 'blog/about.html', { 'navigation' : 'about' })
 
 def page_404(request):
-    return render(request, 'blog/404.html', { 'navigation' : '404' })
+    response = render(request, 'blog/404.html', { 'navigation' : '404' })
+    response.status_code = 404
+    return response
