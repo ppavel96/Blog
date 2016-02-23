@@ -1,13 +1,14 @@
 ﻿from django.shortcuts import render
 
-def posts(request):
-    return render(request, 'blog/posts.html', {})
+def posts(request, category = "hot"):
+    return render(request, 'blog/posts.html', { 'navigation' : 'posts', 'category' : category })
 
 def people(request):
-    return render(request, 'blog/people.html', {})
+    return render(request, 'blog/people.html', { 'navigation' : 'people' })
 
 def blogs(request):
-    return render(request, 'blog/blogs.html', {})
+    return render(request, 'blog/blogs.html', { 'navigation' : 'blogs' })
 
 def about(request):
-    return render(request, 'blog/about.html', {})
+    return render(request, 'blog/about.html', { 'navigation' : 'about' })
+

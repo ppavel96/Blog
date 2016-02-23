@@ -1,19 +1,16 @@
 body {
     background-color: #202020;
     
-    min-width: 1024px;
-    min-height: 100%;
-    
     text-align: left;
     font-family: "Comic Sans MS", cursive, sans-serif;
     font-size: 16px;
     
-    position: relative;
+    min-width: 1024px;
     padding: 0;
     margin: 0;
 }
 
-.navbar {
+.content {
     background-color: #000000;
     border-color: #000000;
 
@@ -21,13 +18,43 @@ body {
     margin-right: 15px;
 }
 
-.navbar-second {
+.content * {
+    margin: initial;
+}
+
+.indent-needed {
     margin-top: 15px;
+}
+
+.height-300 {
+    min-height: 300px;
+}
+
+.height-600 {
+    min-height: 600px;
+}
+
+.content-left {
+    float: left;
+    width: 75%;
+}
+
+.content-right {
+    float: right;
+    min-width: 25%;
+}
+
+.content-name {
+    display: table;
+    margin-left:auto;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .navbar-menu {
     display: table;
     padding-left: 20px;
+    padding-right: 20px;
 }
 
 .navbar-item {
@@ -38,18 +65,23 @@ body {
     height: 30px;
 }
 
-.navbar * {
-    margin-left: initial;
-    margin-right: initial;
-    margin-top: initial;
+h3.navbar-item {
+    color: #ffffff;
+    min-width: 150px;
+    
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    
+    text-align: center;
 }
 
-.two-third-width {
-    width: 66%;
+ul {
+    padding: 0;
 }
 
 a {
-    color: #666666;
+    color: #777777;
     text-decoration: none;
 }
 
