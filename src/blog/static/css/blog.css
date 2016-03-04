@@ -1,17 +1,20 @@
-body {
-    background-color: #202020;
+html {
+    background: url(../background.jpg) no-repeat fixed;
+    background-size: cover;
+    
     font-family: "Comic Sans MS", cursive, sans-serif;
     font-size: 16px;
     min-width: 1024px;
 }
 
 .content {
-    background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.8);
     margin: 0 15px 0 15px;
 }
 
 * {
     text-decoration: none;
+    vertical-align: top;
     padding: 0;
     margin: 0;
 }
@@ -25,7 +28,7 @@ body {
 }
 
 .height-600 {
-    min-height: 600px;
+    min-height: 615px;
 }
 
 .content-left {
@@ -35,7 +38,16 @@ body {
 
 .content-right {
     float: right;
-    min-width: 25%;
+    width: 25%;
+}
+
+.right-align-hack {
+    width: 890px;
+    padding-right: 20px;
+}
+
+.right-align-text, .right-align-hack {
+    text-align: right;
 }
 
 .content-header {
@@ -46,7 +58,7 @@ body {
 .content-header-item {
     display: table-cell;
     vertical-align: middle;
-    min-width: 90px;
+    min-width: 120px;
     height: 30px;
 }
 
@@ -60,12 +72,26 @@ body {
 }
 
 .content-inner {
-    padding: 10px 20px 20px 20px;
+    padding: 10px 10px 10px 10px;
     font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.post, .post img {
+    border: 2px solid green;
+    border-radius: 10px;
 }
 
 p, h1, h2, h3, a {
     color: #ffffff;
+}
+
+.tiny {
+    font-size: 10px;
+}
+
+h3 {
+    font-size: 16px;
 }
 
 .active>a, a:focus, a:hover {

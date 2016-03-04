@@ -6,10 +6,11 @@ from . import views
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/posts/hot/', permanent=True)),
     url(r'^posts/$', RedirectView.as_view(url='/posts/hot/', permanent=True)),
-
     url(r'^posts/(hot|new|best|feed)/$', views.posts, name='posts'),
 
-    url(r'^blogs/$', views.blogs, name='blogs'),
+    url(r'^blogs/$', RedirectView.as_view(url='/blogs/popular/', permanent=True)),
+    url(r'^blogs/(popular|new|feed)/$', views.blogs, name='blogs'),
+
     url(r'^people/$', views.people, name='people'),
     url(r'^about/$', views.about, name='about'),
 

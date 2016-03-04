@@ -4,4 +4,16 @@
 
 {% block content %}
 
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item {% if category == 'popular' %}active{% endif %}"><a href="/blogs/popular/">Популярные</a></li>
+        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/blogs/new/">Новые</a></li>
+        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/blogs/feed/">По подписке</a></li>
+    </ul>
+</nav>
+
+<div class="content height-600 content-inner">
+
+</div> 
+
 {% endblock %}

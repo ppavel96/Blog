@@ -4,6 +4,7 @@ from django.utils import timezone
 
 class Post(models.Model):
     author = models.ForeignKey('auth.User')
+    blog = models.ForeignKey('Blog')
 
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -19,3 +20,9 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+class Blog(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name

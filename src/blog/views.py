@@ -6,8 +6,8 @@ def posts(request, category = "hot"):
 def people(request):
     return render(request, 'blog/people.html', { 'navigation' : 'people' })
 
-def blogs(request):
-    return render(request, 'blog/blogs.html', { 'navigation' : 'blogs' })
+def blogs(request, category = 'popular'):
+    return render(request, 'blog/blogs.html', { 'navigation' : 'blogs', 'category' : category })
 
 def about(request):
     return render(request, 'blog/about.html', { 'navigation' : 'about' })

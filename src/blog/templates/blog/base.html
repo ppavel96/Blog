@@ -4,7 +4,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=1024px">
+    <meta content="width=1024" name="viewport">
     <meta name="description" content="Collective blog">
 
     <title>{% block title %}{% endblock %}</title>
@@ -16,17 +16,20 @@
 
 <body>
     <div>
-        <nav class="content">
+        <nav class="content" role="navigation">
             <ul class="content-header">
                 <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts/hot/">Посты</a></li>
-                <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/">Блоги</a></li>
+                <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/popular/">Блоги</a></li>
                 <li class="content-header-item {% if navigation == 'people' %}active{% endif %}"><a href="/people/">Люди</a></li>
                 <li class="content-header-item {% if navigation == 'about' %}active{% endif %}"><a href="/about/">О проекте</a></li>
+
+                <li class="content-header-item right-align-hack"><a href="/">Вход</a></li>
+                <li class="content-header-item right-align-text"><a href="/">Регистрация</a></li>
             </ul>
         </nav>
 
         <div class="indent-needed">
-            <div class="content-left">
+            <div class="content-left" role="main">
                 {% block content %}{% endblock %}
             </div>
 
