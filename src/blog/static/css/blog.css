@@ -28,7 +28,7 @@ html {
 }
 
 .height-600 {
-    min-height: 615px;
+    min-height: 623px;
 }
 
 .content-left {
@@ -43,23 +43,33 @@ html {
 
 .right-align-hack {
     width: 890px;
-    padding-right: 20px;
+}
+
+.right-indent {
+    padding-left: 50px;
 }
 
 .right-align-text, .right-align-hack {
     text-align: right;
+    padding-right: 20px;
 }
 
 .content-header {
-    display: table;
     padding: 0 20px 0 20px;
 }
 
+.table, .content-header {
+    display: table;
+}
+
 .content-header-item {
-    display: table-cell;
     vertical-align: middle;
     min-width: 120px;
     height: 30px;
+}
+
+.table-cell, .content-header-item {
+    display: table-cell;
 }
 
 .content-right .content-header-item {
