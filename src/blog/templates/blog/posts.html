@@ -17,5 +17,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{%  static 'js/post_load.js' %}" defer></script>
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadPosts('{{category}}'); }
+</script>
 {% endblock %}

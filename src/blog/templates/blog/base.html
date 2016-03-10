@@ -15,85 +15,83 @@
 </head>
 
 <body>
-    <div>
-        <nav class="content" role="navigation">
-            <ul class="content-header">
-                <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts/hot/">Посты</a></li>
-                <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/popular/">Блоги</a></li>
-                <li class="content-header-item {% if navigation == 'people' %}active{% endif %}"><a href="/people/">Люди</a></li>
-                <li class="content-header-item {% if navigation == 'about' %}active{% endif %}"><a href="/about/">О проекте</a></li>
+    <div id="background"> </div>
+    <nav class="content" role="navigation">
+        <ul class="content-header">
+            <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts/hot/">Посты</a></li>
+            <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/best/">Блоги</a></li>
+            <li class="content-header-item {% if navigation == 'people' %}active{% endif %}"><a href="/people/">Люди</a></li>
+            <li class="content-header-item {% if navigation == 'about' %}active{% endif %}"><a href="/about/">О проекте</a></li>
 
-                <li class="content-header-item right-align-hack"><a href="/">Вход</a></li>
-                <li class="content-header-item right-align-text"><a href="/">Регистрация</a></li>
-            </ul>
-        </nav>
+            <li class="content-header-item right-align-hack"><a href="/">Вход</a></li>
+            <li class="content-header-item right-align-text"><a href="/">Регистрация</a></li>
+        </ul>
+    </nav>
 
-        <div class="indent-needed">
-            <div class="content-left" role="main">
-                {% block content %}{% endblock %}
-            </div>
+    <div class="indent-needed">
+        <div class="content-left" role="main">
+            {% block content %}{% endblock %}
+        </div>
 
-            <div class="content-right">
-                <div>
-                    <div class="content content-header">
-                        <p class="content-header-item">Популярные теги</p>
-                    </div>
+        <div class="content-right">
+            <div>
+                <div class="content content-header">
+                    <p class="content-header-item">Популярные теги</p>
+                </div>
 
-                    <div class="content height-300">
-                        <div class="table">
-                            <div class="table-cell content-inner">
-                                <p>Кот</p>
-                                <p>Авто</p>
-                                <p>Видио</p>
-                                <p>Политика</p>
-                                <p>История</p>
-                                <p>Футбол</p>
-                                <p>Подарок</p>
-                                <p>Учеба</p>
-                                <p>Спойлер</p>
-                                <p>Полиция</p>
-                                <p>Халява</p>
-                                <p>Розыгрыш</p>
-                                <p>Грусть</p>
-                                <p>Посылка</p>
-                            </div>
+                <div class="content height-300">
+                    <div class="table">
+                        <div class="table-cell content-inner">
+                            <p>Кот</p>
+                            <p>Авто</p>
+                            <p>Видио</p>
+                            <p>Политика</p>
+                            <p>История</p>
+                            <p>Футбол</p>
+                            <p>Подарок</p>
+                            <p>Учеба</p>
+                            <p>Спойлер</p>
+                            <p>Полиция</p>
+                            <p>Халява</p>
+                            <p>Розыгрыш</p>
+                            <p>Грусть</p>
+                            <p>Посылка</p>
+                        </div>
 
-                            <div class="table-cell content-inner">
-                                <div class="right-indent">
-                                    <p>Арт</p>
-                                    <p>Россия</p>
-                                    <p>Игры</p>
-                                    <p>Работа</p>
-                                    <p>Музыка</p>
-                                    <p>Аниме</p>
-                                    <p>Оружие</p>
-                                    <p>Алкоголь</p>
-                                    <p>Пятница</p>
-                                    <p>Проблема</p>
-                                    <p>Фейл</p>
-                                    <p>Добро</p>
-                                    <p>Поезд</p>
-                                    <p>Пляж</p>
-                                </div>
+                        <div class="table-cell content-inner">
+                            <div class="right-indent">
+                                <p>Арт</p>
+                                <p>Россия</p>
+                                <p>Игры</p>
+                                <p>Работа</p>
+                                <p>Музыка</p>
+                                <p>Аниме</p>
+                                <p>Оружие</p>
+                                <p>Алкоголь</p>
+                                <p>Пятница</p>
+                                <p>Проблема</p>
+                                <p>Фейл</p>
+                                <p>Добро</p>
+                                <p>Поезд</p>
+                                <p>Пляж</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="indent-needed">
-                    <div class="content content-header">
-                        <p class="content-header-item">Реклама</p>
-                    </div>
+            </div>
 
-                    <div class="content height-300">
+            <div class="indent-needed">
+                <div class="content content-header">
+                    <p class="content-header-item">Реклама</p>
+                </div>
 
-                    </div>
+                <div class="content height-300">
                 </div>
             </div>
         </div>
     </div>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" defer></script>
+
+    <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
