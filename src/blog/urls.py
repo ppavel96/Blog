@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^people/$', views.people, name='people'),
     url(r'^about/$', views.about, name='about'),
 
+    url(r'^ajax/posts/$', views.ajax_posts, name='ajax_posts'),
+
     url(r'^robots.txt$', TemplateView.as_view(template_name='blog/robots.txt', content_type='text/plain')),
     url(r'^humans.txt$', TemplateView.as_view(template_name='blog/humans.txt', content_type='text/plain')),
 
