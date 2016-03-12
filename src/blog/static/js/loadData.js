@@ -60,21 +60,24 @@ function loadBlogs(inCategory) {
 function constructPosts(posts) {
     for (var i = 0; i < posts.length; i++) {
         var postClass = (i == 0 && loadPosts.nextID == 0) ? 'post' : 'post indent-needed';
+        var timerID = "postPublishTime_" + posts[i].id;
 
         timersToUpdate.push({
-            id: "publishTime_" + (loadPosts.nextID + i).toString(),
+            id: "#" + timerID,
             time: Date.parse(posts[i].publishedDate)
         });
 
         var text = '<div class="' + postClass + '">' +
                    '    <div class="content-inner">' +
-                   '        <h3>' + posts[i].title + '</h3>' +
-                   '        <p class="tiny">Опубликовал ' + posts[i].author + ' в ' + posts[i].blog + ' <span id="' + timersToUpdate[timersToUpdate.length - 1].id + '"></span></p>' +
+                   '        <h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1>' +
+                   '        <p class="tiny">' + 
+                   '            <b>Автор:</b> ' + posts[i].author + '<b>; Блог:</b> ' + posts[i].blog + '; <b>Рейтинг:</b> ' + posts[i].rating + '; <b>Комментарии:</b> ' + posts[i].comments + '; <b>Опубликовано:</b> <span id="' + timerID + '"></span>' +
+                   '        </p>' +
                    '        <br />';
 
         text += posts[i].HTMLContent;
 
-        text +=    '    <a class="content-right right-align-text" href="/posts/1/">Читать комментарии... </a>' +
+        text +=    '    <a class="content-right right-align-text" href="/posts/' + posts[i].id + '/">Читать комментарии... </a>' +
                    '    </div>' +
                    '</div>';
 
@@ -87,34 +90,47 @@ function constructPosts(posts) {
 function constructBlogs(blogs) {
     for (var i = 0; i < blogs.length; i++) {
         var blogClass = (i == 0 && loadBlogs.nextID == 0) ? 'post' : 'post indent-needed';
+        var timerID = "blogPublishTime_" + blogs[i].id;
+
+        timersToUpdate.push({
+            id: "#" + timerID,
+            time: Date.parse(blogs[i].publishedDate)
+        });
 
         var text = '<div class="' + blogClass + '">' +
                    '    <div class="table">' + 
                    '        <div class="table-cell content-inner">' +
-                   '            <img src="' + blogs[i].avatar + '" alt="Blog avatar" width="100" height="100" />' +
+                   '            <img src="' + blogs[i].avatar + '" alt="Blog avatar" width="120" height="120" />' +
                    '        </div>' +
 
                    '        <div class="table-cell content-inner">' +
-                   '            <h3>' + blogs[i].title + '</h3>' +
+                   '            <h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1>' +
+                   '            <p class="tiny">' +
+                   '                <b>Участников:</b> ' + blogs[i].members + '<b>; Постов:</b> ' + blogs[i].posts + '; <b>Создан:</b> <span id="' + timerID + '"></span>' +
+                   '            </p>' +
+                   '            <br />' +
+
                    '            <p>' + blogs[i].description + '</p>' + 
-                   '            <a class="content-right right-align-text" href="/blogs/1/">Читать посты... </a>' +
+                   '            <a class="content-right right-align-text" href="/blogs/' + blogs[i].id + '/">Читать посты... </a>' +
                    '        </div>' +
                    '    </div>' +
                    '</div>';
 
         $("#blog_pool").append(text);
     }
+
+    timersUpdate();
 }
 
 timersToUpdate = [];
 function timersUpdate() {
     for (var i = 0; i < timersToUpdate.length; i++) {
         var mins = Math.ceil((Date.now() - timersToUpdate[i].time) / 60000);
-        if (mins > 60) {
-            var hours = Math.ceil(mins / 60);
-            $('#' + timersToUpdate[i].id).text(hours.toString() + " часов(а) назад");
-        } else
-            $('#' + timersToUpdate[i].id).text(mins.toString() + " минут(ы) назад");
+
+        if (mins > 60)
+            $(timersToUpdate[i].id).text(Math.ceil(mins / 60).toString() + " часов(а) назад");
+        else
+            $(timersToUpdate[i].id).text(mins.toString() + " минут(ы) назад");
     }
 }
 

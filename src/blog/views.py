@@ -24,6 +24,7 @@ def ajax(request):
     navigation = request.GET.get('navigation', '')
     category = request.GET.get('category', '')
     older = request.GET.get('older', '')
+    newer = request.GET.get('newer', '')
 
     if navigation == 'posts':
         if category == 'hot':
@@ -37,7 +38,7 @@ def ajax(request):
 
     if navigation == 'blogs':
         if category == 'new':
-            array = Blog.objects.order_by('-createdDate')
+            array = Blog.objects.order_by('-publishedDate')
         if category == 'best':
             array = Blog.objects.all()
         if category == 'feed':
@@ -45,6 +46,9 @@ def ajax(request):
 
     if older != '':
         array = array.filter(publishedDate__lt=older)
+
+    if newer != '':
+        array = array.filter(publishedDate__gt=newer)
 
     for i in array[id:id + count]:
         response.append(i.getDict())

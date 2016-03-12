@@ -10,7 +10,9 @@ class Post(models.Model):
     HTMLContent = models.TextField()
 
     publishedDate = models.DateTimeField(blank=True, null=True)
+
     rating = models.PositiveIntegerField(default=0)
+    comments = models.PositiveIntegerField(default=0)
 
     def getDict(self):
         return { 'author' : self.author.username,
@@ -18,7 +20,9 @@ class Post(models.Model):
                  'title' : self.title,
                  'HTMLContent' : self.HTMLContent,
                  'publishedDate' : self.publishedDate.isoformat(),
-                 'rating' : self.rating }
+                 'rating' : self.rating,
+                 'comments' : self.comments,
+                 'id' : self.id }
 
     def publish(self):
         self.publishedDate = timezone.now()
@@ -34,11 +38,17 @@ class Blog(models.Model):
     avatar = models.CharField(max_length=200)
     publishedDate = models.DateTimeField(blank=True, null=True)
 
+    members = models.PositiveIntegerField(default=0)
+    posts = models.PositiveIntegerField(default=0)
+
     def getDict(self):
         return { 'title' : self.title,
                  'description' : self.description,
                  'avatar' : self.avatar,
-                 'publishedDate' : self.publishedDate.isoformat() }
+                 'publishedDate' : self.publishedDate.isoformat(),
+                 'members' : self.members,
+                 'posts' : self.posts,
+                 'id' : self.id }
 
     def publish(self):
         self.publishedDate = timezone.now()
