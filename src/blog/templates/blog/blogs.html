@@ -1,4 +1,5 @@
 ﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
 
 {% block title %}Блоги{% endblock %}
 
@@ -12,74 +13,13 @@
     </ul>
 </nav>
 
-<div class="content height-600 content-inner">
-    <div class="post">
-        <div class="table">
-            <div class="table-cell content-inner">
-               <img src="https://pp.vk.me/c621917/v621917502/3bb8c/P2vWQNoqy10.jpg" alt="Post image" width="100" height="100" />
-            </div>
+<div class="content height-600 content-inner" id="blog_pool"></div> 
 
-            <div class="table-cell content-inner">
-                <h3>Lorem ipsum</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                   Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                   Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...</p>
-                <a class="content-right right-align-text" href="/posts/1/">Читать посты... </a>
-            </div>
-        </div>
-    </div>
+{% endblock %}
 
-    <div class="post indent-needed">
-        <div class="table">
-            <div class="table-cell content-inner">
-               <img src="https://pp.vk.me/c630929/v630929471/1b779/RCapSj1HEgA.jpg" alt="Post image" width="100" height="100" />
-            </div>
-
-            <div class="table-cell content-inner">
-                <h3>Lorem ipsum</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                   Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                   Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...</p>
-                <a class="content-right right-align-text" href="/posts/1/">Читать посты... </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="post indent-needed">
-        <div class="table">
-            <div class="table-cell content-inner">
-               <img src="https://pp.vk.me/c623917/v623917809/15d81/LcJ2FM6eCAc.jpg" alt="Post image" width="100" height="100" />
-            </div>
-
-            <div class="table-cell content-inner">
-                <h3>Lorem ipsum</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                   Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                   Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...</p>
-                <a class="content-right right-align-text" href="/posts/1/">Читать посты... </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="post indent-needed">
-        <div class="table">
-            <div class="table-cell content-inner">
-               <img src="https://pp.vk.me/c622427/v622427143/53c19/8IrYD_0fhOY.jpg" alt="Post image" width="100" height="100" />
-            </div>
-
-            <div class="table-cell content-inner">
-                <h3>Lorem ipsum</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                   Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                   Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...</p>
-                <a class="content-right right-align-text" href="/posts/1/">Читать посты... </a>
-            </div>
-        </div>
-    </div>
-</div> 
-
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadBlogs('{{category}}'); }
+</script>
 {% endblock %}

@@ -21,15 +21,30 @@ def ajax(request):
     response = []
     array = []
 
-    if request.GET.get('navigation', '') == 'posts':
-        if request.GET.get('category', '') == 'hot':
+    navigation = request.GET.get('navigation', '')
+    category = request.GET.get('category', '')
+    older = request.GET.get('older', '')
+
+    if navigation == 'posts':
+        if category == 'hot':
             array = Post.objects.order_by('publishedDate')
-        elif request.GET.get('category', '') == 'new':
+        if category == 'new':
             array = Post.objects.order_by('-publishedDate')
-        elif request.GET.get('category', '') == 'best':
+        if category == 'best':
             array = Post.objects.order_by('-rating')
-        else:
+        if category == 'feed':
             array = Post.objects.all()
+
+    if navigation == 'blogs':
+        if category == 'new':
+            array = Blog.objects.order_by('-createdDate')
+        if category == 'best':
+            array = Blog.objects.all()
+        if category == 'feed':
+            array = Blog.objects.all()
+
+    if older != '':
+        array = array.filter(publishedDate__lt=older)
 
     for i in array[id:id + count]:
         response.append(i.getDict())

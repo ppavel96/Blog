@@ -32,8 +32,17 @@ class Blog(models.Model):
     description = models.TextField()
 
     avatar = models.CharField(max_length=200)
+    publishedDate = models.DateTimeField(blank=True, null=True)
 
-    created_date = models.DateTimeField(blank=True, null=True)
+    def getDict(self):
+        return { 'title' : self.title,
+                 'description' : self.description,
+                 'avatar' : self.avatar,
+                 'publishedDate' : self.publishedDate.isoformat() }
+
+    def publish(self):
+        self.publishedDate = timezone.now()
+        self.save()
 
     def __str__(self):
         return self.title
