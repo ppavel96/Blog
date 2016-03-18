@@ -2,14 +2,14 @@
     if (loadData.isLoading == undefined)
         loadData.isLoading = false;
 
-    var NEAR_BOTTOM_HEIGHT = 300;
+    var NEAR_BOTTOM_HEIGHT = 1000;
 
     if ($(window).scrollTop() + $(window).height() > $(document).height() - NEAR_BOTTOM_HEIGHT && !loadData.isLoading) {
         loadData.isLoading = true;
 
         $.ajax({
             dataType: "json",
-            url: "/ajax/",
+            url: "/api/",
             data: request,
             success: callback,
             complete: function () { loadData.isLoading = false; }
@@ -26,10 +26,10 @@ function loadPosts(inCategory) {
 
     var LOAD_COUNT = 5;
 
-    var request = { navigation: 'posts', category: inCategory, id: loadPosts.nextID, count: LOAD_COUNT, older: loadPosts.startTime.toISOString() };
+    var request = { method: 'posts.get', category: inCategory, id: loadPosts.nextID, count: LOAD_COUNT, older: loadPosts.startTime.toISOString() };
     if (!loadPosts.noMore)
         loadData(request, function (posts) {
-            constructPosts(posts);
+            constructPosts(posts, true);
 
             loadPosts.nextID += posts.length;
             if (posts.length < LOAD_COUNT)
@@ -46,7 +46,7 @@ function loadBlogs(inCategory) {
 
     var LOAD_COUNT = 10;
 
-    var request = { navigation: 'blogs', category: inCategory, id: loadBlogs.nextID, count: LOAD_COUNT, older: loadBlogs.startTime.toISOString() };
+    var request = { method: 'blogs.get', category: inCategory, id: loadBlogs.nextID, count: LOAD_COUNT, older: loadBlogs.startTime.toISOString() };
     if (!loadBlogs.noMore)
         loadData(request, function (blogs) {
             constructBlogs(blogs);
@@ -57,7 +57,18 @@ function loadBlogs(inCategory) {
         });
 }
 
-function constructPosts(posts) {
+function loadPostByID(ID) {
+    if (loadPostByID.OnlyOnce == undefined) {
+        var request = { method: 'posts.getByID', id: ID };
+        loadData(request, function (posts) {
+            constructPosts(posts, false);
+        });
+
+        loadPostByID.OnlyOnce = true;
+    }
+}
+
+function constructPosts(posts, bCommentLink) {
     for (var i = 0; i < posts.length; i++) {
         var postClass = (i == 0 && loadPosts.nextID == 0) ? 'post' : 'post indent-needed';
         var timerID = "postPublishTime_" + posts[i].id;
@@ -68,18 +79,24 @@ function constructPosts(posts) {
         });
 
         var text = '<div class="' + postClass + '">' +
-                   '    <div class="content-inner">' +
-                   '        <h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1>' +
-                   '        <p class="tiny">' + 
-                   '            <b>Автор:</b> ' + posts[i].author + '<b>; Блог:</b> ' + posts[i].blog + '; <b>Рейтинг:</b> ' + posts[i].rating + '; <b>Комментарии:</b> ' + posts[i].comments + '; <b>Опубликовано:</b> <span id="' + timerID + '"></span>' +
-                   '        </p>' +
-                   '        <br />';
+                    '    <div class="content-inner">' +
+                    '        <h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1>' +
+                    '        <p class="tiny">' +
+                    '            <b>Автор:</b> ' + posts[i].author + '<b>; Блог:</b> ' + posts[i].blog + '; <b>Рейтинг:</b> ' + posts[i].rating + '; <b>Комментарии:</b> ' + posts[i].comments + '; <b>Опубликовано:</b> <span id="' + timerID + '"></span>' +
+                    '        </p>' +
+                    '        <br />';
 
         text += posts[i].HTMLContent;
 
-        text +=    '    <a class="content-right right-align-text" href="/posts/' + posts[i].id + '/">Читать комментарии... </a>' +
-                   '    </div>' +
-                   '</div>';
+        if (bCommentLink)
+            text += '    <a class="content-right right-align-text" href="/posts/' + posts[i].id + '/">Читать комментарии... </a>';
+
+        // THIS IS TEMPORARY
+        else
+            text += '    <br><h1 id="comments">Комментарии:</h1><p>Комментариев нет</p>'
+
+        text += '    </div>' +
+                    '</div>';
 
         $("#post_pool").append(text);
     }

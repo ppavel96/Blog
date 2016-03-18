@@ -2,7 +2,7 @@
 from django.http import JsonResponse
 from blog.models import *
 
-def posts(request, category = "hot"):
+def posts(request, category = 'hot'):
     return render(request, 'blog/posts.html', { 'navigation' : 'posts', 'category' : category })
 
 def people(request):
@@ -14,46 +14,57 @@ def blogs(request, category = 'best'):
 def about(request):
     return render(request, 'blog/about.html', { 'navigation' : 'about' })
 
-def ajax(request):
-    id = int(request.GET.get('id', '0'))
-    count = int(request.GET.get('count', '0'))
+def comments(request, id = '0'):
+    if Post.objects.filter(id=id).count() > 0:
+        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'id' : id })
+    else:
+        return page_404(request)
 
-    response = []
-    array = []
+def api(request):
+    method = request.GET.get('method', '')
 
-    navigation = request.GET.get('navigation', '')
-    category = request.GET.get('category', '')
-    older = request.GET.get('older', '')
-    newer = request.GET.get('newer', '')
-
-    if navigation == 'posts':
-        if category == 'hot':
-            array = Post.objects.order_by('publishedDate')
-        if category == 'new':
-            array = Post.objects.order_by('-publishedDate')
-        if category == 'best':
-            array = Post.objects.order_by('-rating')
-        if category == 'feed':
+    if method in ('posts.get', 'blogs.get'):
+        if method == 'posts.get':
             array = Post.objects.all()
+        if method == 'blogs.get':
+            array = Blog.objects.all()
 
-    if navigation == 'blogs':
+        category = request.GET.get('category', '')
+        older = request.GET.get('older', '')
+        newer = request.GET.get('newer', '')
+
+        if category == 'hot' and method == 'posts.get':
+            array = array.order_by('publishedDate')
+        if category == 'best' and method == 'posts.get':
+            array = array.order_by('-rating')
         if category == 'new':
-            array = Blog.objects.order_by('-publishedDate')
-        if category == 'best':
-            array = Blog.objects.all()
-        if category == 'feed':
-            array = Blog.objects.all()
+            array = array.order_by('-publishedDate')
 
-    if older != '':
-        array = array.filter(publishedDate__lt=older)
+        if older != '':
+            array = array.filter(publishedDate__lt=older)
 
-    if newer != '':
-        array = array.filter(publishedDate__gt=newer)
+        if newer != '':
+            array = array.filter(publishedDate__gt=newer)
 
-    for i in array[id:id + count]:
-        response.append(i.getDict())
+        response = []
 
-    return JsonResponse(response, safe=False)
+        id = int(request.GET.get('id', '0'))
+        count = int(request.GET.get('count', '0'))
+
+        for i in array[id:id + count]:
+            response.append(i.getDict())
+
+        return JsonResponse(response, safe=False)
+
+    elif method == 'posts.getByID':
+        try:
+            post = Post.objects.get(id=request.GET.get('id', ''))
+            return JsonResponse([post.getDict()], safe=False)
+
+        except:
+            return JsonResponse([], safe=False)
+
+    return JsonResponse([], safe=False)
 
 def page_404(request):
     response = render(request, 'blog/404.html', { 'navigation' : '404' })
