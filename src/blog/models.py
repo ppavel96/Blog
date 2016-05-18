@@ -21,7 +21,7 @@ class Post(models.Model):
 
     # JSON
 
-    def getDict(self):
+    def to_JSON(self):
         return { 'author' : self.author.username,
                  'blog' : self.blog.__str__(),
 
@@ -86,7 +86,7 @@ class Comment(models.Model):
 
     # JSON
 
-    def getDict(self):
+    def to_JSON(self):
         return { 'author' : self.author.username,
                  'post' : self.post,
 
@@ -135,7 +135,7 @@ class Blog(models.Model):
 
     # JSON
 
-    def getDict(self):
+    def to_JSON(self):
         return { 'title' : self.title,
                  'image' : self.image,
 
@@ -182,7 +182,7 @@ class Profile(models.Model):
 
     # JSON
 
-    def getDict(self):
+    def to_JSON(self):
         return { 'username' : self.user.username,
                  'firstName' : self.user.first_name,
                  'lastName' : self.user.last_name,
