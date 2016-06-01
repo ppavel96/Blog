@@ -1,15 +1,15 @@
 ﻿{% extends "blog/base.html" %}
 {% load static from staticfiles %}
 
-{% block title %}Блоги{% endblock %}
+{% block title %}Blogs{% endblock %}
 
 {% block content %}
 
 <nav class="content content-header" role="navigation">
     <ul>
-        <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/blogs/best/">Лучшие</a></li>
-        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/blogs/new/">Новые</a></li>
-        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/blogs/feed/">Подписки</a></li>
+        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/blogs/new/">New</a></li>
+        <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/blogs/best/">Best</a></li>
+        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/blogs/feed/">Feed</a></li>
     </ul>
 </nav>
 

@@ -1,16 +1,15 @@
 ﻿{% extends "blog/base.html" %}
 {% load static from staticfiles %}
 
-{% block title %}{% endblock %}
+{% block title %} {{ post.title }} {% endblock %}
 
 {% block content %}
 <nav class="content content-header" role="navigation">
     <ul>
-        <li class="content-header-item"><a href="/posts/hot/">Горячее</a></li>
-        <li class="content-header-item"><a href="/posts/new/">Новое</a></li>
-        <li class="content-header-item"><a href="/posts/best/">Лучшее</a></li>
-        <li class="content-header-item"><a href="/posts/feed/">Подписки</a></li>
-        <li class="content-header-item active"><a href="/posts/{{id}}/">Комментарии</a></li>
+        <li class="content-header-item"><a href="/posts/new/">New</a></li>
+        <li class="content-header-item"><a href="/posts/best/">Best</a></li>
+        <li class="content-header-item"><a href="/posts/feed/">Feed</a></li>
+        <li class="content-header-item active"><a href="/posts/{{post.id}}/">Comments</a></li>
     </ul>
 </nav>
 
@@ -20,6 +19,6 @@
 {% block scripts %}
 <script defer src="{%  static 'js/loadData.js' %}"></script>
 <script>
-    window.onload = function () { loadPostByID(parseInt('{{id}}')); }
+    window.onload = function () { constructPosts([ {{ post.to_JSON|safe }} ], false); }
 </script>
 {% endblock %}

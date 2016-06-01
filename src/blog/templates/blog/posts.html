@@ -1,15 +1,14 @@
 ﻿{% extends "blog/base.html" %}
 {% load static from staticfiles %}
 
-{% block title %}{% if category == 'hot' %}Горячее{% endif %}{% if category == 'new' %}Новое{% endif %}{% if category == 'best' %}Лучшее{% endif %}{% if category == 'feed' %}По подписке{% endif %}{% endblock %}
+{% block title %}{% if category == 'new' %}New{% endif %}{% if category == 'best' %}Best{% endif %}{% if category == 'feed' %}Feed{% endif %}{% endblock %}
 
 {% block content %}
 <nav class="content content-header" role="navigation">
     <ul>
-        <li class="content-header-item {% if category == 'hot' %}active{% endif %}"><a href="/posts/hot/">Горячее</a></li>
-        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/posts/new/">Новое</a></li>
-        <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/posts/best/">Лучшее</a></li>
-        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/posts/feed/">Подписки</a></li>
+        <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/posts/new/">New</a></li>
+        <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/posts/best/">Best</a></li>
+        <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/posts/feed/">Feed</a></li>
     </ul>
 </nav>
 

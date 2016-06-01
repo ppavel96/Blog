@@ -5,9 +5,9 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='/posts/hot/', permanent=True)),
-    url(r'^posts/$', RedirectView.as_view(url='/posts/hot/', permanent=True)),
-    url(r'^posts/(hot|new|best|feed)/$', views.posts, name='posts'),
+    url(r'^$', RedirectView.as_view(url='/posts/new/', permanent=True)),
+    url(r'^posts/$', RedirectView.as_view(url='/posts/new/', permanent=True)),
+    url(r'^posts/(new|best|feed)/$', views.posts, name='posts'),
 
     url(r'^posts/([0-9]+)/$', views.comments, name='comments'),
 
@@ -30,9 +30,9 @@ urlpatterns = [
     url(r'^api/blogs.getById$', views.blogs_getById, name='api'), # blogs.getById(id) --> blog in JSON
     url(r'^api/users.getById$', views.users_getById, name='api'), # users.getById(id) --> user in JSON
 
-    url(r'^api/comments.get$', views.comments_get, name='api'),
-    url(r'^api/comments.getByPost$', views.comments_get, name='api'),
-    url(r'^api/comments.getByUser$', views.comments_get, name='api'),
+    url(r'^api/comments.get$', views.comments_get, name='api'),             # comments.get(older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
+    url(r'^api/comments.getByPost$', views.comments_getByPost, name='api'), # comments.get(post_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
+    url(r'^api/comments.getByUser$', views.comments_getByUser, name='api'), # comments.get(user_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
 
     url(r'^api/posts.getFollowers$', views.posts_getFollowers, name='api'), # posts.getFollowers(post_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
     url(r'^api/blogs.getFollowers$', views.blogs_getFollowers, name='api'), # blogs.getFollowers(blog_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
@@ -40,11 +40,7 @@ urlpatterns = [
 
     url(r'^api/users.getSubscriptionsForPosts$', views.users_getSubscriptionsForPosts, name='api'), # users.getSubscriptionsForPosts(user_id, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only
     url(r'^api/users.getSubscriptionsForBlogs$', views.users_getSubscriptionsForBlogs, name='api'), # users.getSubscriptionsForBlogs(user_id, older, newwer, better, worse, id, count, return_only_ids) --> array of blogs in JSON or their ids only
-    url(r'^api/users.getSubscriptionsForUsers$', views.users_getSubscriptionsForBlogs, name='api'), # users.getSubscriptionsForUsers(user_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
-
-    # isSubscribed
-    # isFollower
-    # getVote
+    url(r'^api/users.getSubscriptionsForUsers$', views.users_getSubscriptionsForUsers, name='api'), # users.getSubscriptionsForUsers(user_id, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
 
     # API (POST)
 

@@ -22,19 +22,25 @@ class Post(models.Model):
     # JSON
 
     def to_JSON(self):
-        return { 'author' : self.author.username,
-                 'blog' : self.blog.__str__(),
+        tags = list()
+        for i in self.tags.all():
+            tags.append(i.__str__())
 
-                 'title' : self.title,
-                 'content' : self.content,
+        return { "author" : self.author.username,
+                 "blog" : self.blog.__str__(),
 
-                 'publishedDate' : self.publishedDate.isoformat(),
+                 "title" : self.title,
+                 "content" : self.content,
 
-                 'cachedRating' : self.cachedRating,
-                 'cachedCommentsNumber' : self.cachedCommentsNumber,
-                 'cachedSubscriptionsNumber' : self.cachedSubscriptionsNumber,
+                 "publishedDate" : self.publishedDate.isoformat(),
 
-                 'id' : self.id }
+                 "tags" : tags,
+
+                 "cachedRating" : self.cachedRating,
+                 "cachedCommentsNumber" : self.cachedCommentsNumber,
+                 "cachedSubscriptionsNumber" : self.cachedSubscriptionsNumber,
+
+                 "id" : self.id }
 
     # Publish
 
@@ -136,7 +142,9 @@ class Blog(models.Model):
     # JSON
 
     def to_JSON(self):
-        return { 'title' : self.title,
+        return { 'creator' : self.creator.username,
+
+                 'title' : self.title,
                  'image' : self.image,
 
                  'description' : self.description,

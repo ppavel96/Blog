@@ -19,7 +19,7 @@ def about(request):
 
 def comments(request, id = '0'):
     if Post.objects.filter(id=id).count() > 0:
-        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'id' : id })
+        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'post' : Post.objects.get(id=id) })
     
     return page_404(request)
 
@@ -87,6 +87,22 @@ def filter_users(request, array):
     return array[id:id + count]
 
 
+def filter_comments(request, array):
+    older, newer, better, worse, id, count = parse_request(request)
+
+    if older != '':
+        array = array.filter(publishedDate__lt=older)
+    if newer != '':
+        array = array.filter(publishedDate__gt=newer)
+
+    if better != '':
+        array = array.filter(cachedRating__gt=better)
+    if worse != '':
+        array = array.filter(cachedRating__lt=worse)
+
+    return array[id:id + count]
+
+
 def to_JSON(request, array):
     return_only_ids =  int(request.GET.get('return_only_ids', '0'))
     if return_only_ids == 1:
@@ -103,7 +119,7 @@ def posts_get(request):
 
         array = []
         if category == 'new':
-            array = Post.objects.all().order_by('publishedDate')
+            array = Post.objects.all().order_by('-publishedDate')
         if category == 'best':
             array = Post.objects.all().order_by('cachedRating')
 
@@ -165,7 +181,26 @@ def users_getById(request):
 
 
 def comments_get(request):
+    try:
+        return JsonResponse(to_JSON(request, filter_comments(request, Comment.objects.all().order_by('cachedRating'))), safe=False)
+
+    except:
+        return JsonResponse(['Error'], safe=False)
+
+
+def comments_getByPost(request):
     pass
+
+
+def comments_getByUser(request):
+    try:
+        user = Profile.objects.get(id=request.GET.get('user_id', ''))
+        array = user.comment_set.all()
+
+        return JsonResponse(to_JSON(request, filter_comments(request, array)), safe=False)
+
+    except:
+        return JsonResponse(['Error'], safe=False)
 
 
 def posts_getFollowers(request):

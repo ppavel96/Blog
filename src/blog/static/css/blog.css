@@ -1,9 +1,8 @@
 body {
-    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-family: "Open Sans", cursive, sans-serif;
     font-size: 16px;
     
-    min-width: 1024px;
-    max-width: 1600px;
+    width: 1024px;
     
     margin-left: auto;
     margin-right: auto;
@@ -48,7 +47,7 @@ img {
 }
 
 .height-600 {
-    min-height: 623px;
+    min-height: 1660px;
 }
 
 .content-left {
@@ -107,18 +106,46 @@ img {
     margin-bottom: 20px;
 }
 
-.post, .post img {
-    border: 2px solid green;
-    border-radius: 10px;
-}
-
-p, h1, h2, h3, a {
+p, h1, h2, h3, h1 a, h2 a, h3 a {
     color: #ffffff;
     background: url('');
 }
 
+a, .nointerest {
+    color: #aaaaaa;
+}
+
+.interest0 {
+    color: #ff0000;
+}
+
+.interest1 {
+    color: #ff2a00;
+}
+
+.interest2 {
+    color: #ff3b00;
+}
+
+.interest3 {
+    color: #ff4c00;
+}
+
+.interest4 {
+    color: #ff5d00;
+}
+
+.interest5 {
+    color: #ff6e00;
+}
+
+hr {
+    border-color: #333333;
+}
+
 .tiny {
     font-size: 10px;
+    margin-top: 5px;
 }
 
 h1 {
@@ -126,5 +153,5 @@ h1 {
 }
 
 .active>a, a:focus, a:hover {
-    color: #00ff00;
+    color: #ffffff;
 }
