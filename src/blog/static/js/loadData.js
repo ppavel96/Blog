@@ -22,7 +22,7 @@
     request['id'] = loadGeneric.nextID[url];
     request['older'] = loadGeneric.startTime;
 
-    if ($(window).scrollTop() + $(window).height() > $(document).height() - loadGeneric.NEAR_BOTTOM_HEIGHT && !loadGeneric.isLoading) {
+    if ((loadGeneric.nextID[url] == 0 || $(window).scrollTop() + $(window).height() > $(document).height() - loadGeneric.NEAR_BOTTOM_HEIGHT) && !loadGeneric.isLoading) {
         loadGeneric.isLoading = true;
 
         $.ajax({
