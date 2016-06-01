@@ -42,38 +42,16 @@
                 <div class="content height-300">
                     <div class="table">
                         <div class="table-cell content-inner">
-                            <p>Cat</p>
-                            <p>Auto</p>
-                            <p>Video</p>
-                            <p>Politics</p>
-                            <p>History</p>
-                            <p>Football</p>
-                            <p>Present</p>
-                            <p>Studies</p>
-                            <p>Sploiler</p>
-                            <p>Police</p>
-                            <p>Kek</p>
-                            <p>Surprise</p>
-                            <p>Sadness</p>
-                            <p>Whatever</p>
+                            {% for i in tags|slice:":14" %}
+                                <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
+                            {% endfor %}
                         </div>
 
                         <div class="table-cell content-inner">
                             <div class="right-indent">
-                                <p>Art</p>
-                                <p>Russia</p>
-                                <p>Games</p>
-                                <p>Work</p>
-                                <p>Music</p>
-                                <p>Anime</p>
-                                <p>Weapon</p>
-                                <p>Weekends</p>
-                                <p>Luck</p>
-                                <p>Problem</p>
-                                <p>Fail</p>
-                                <p>Good</p>
-                                <p>Train</p>
-                                <p>Beach</p>
+                                {% for i in tags|slice:"14:28" %}
+                                    <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>

@@ -58,7 +58,9 @@ function loadBlogs(inCategory) {
     loadGeneric('/api/blogs.get', { category: inCategory }, constructBlogs);
 }
 
-function constructPosts(posts, comment_link = true) {
+function constructPosts(posts, comment_link) {
+    comment_link = typeof comment_link != 'undefined' ? comment_link : true;
+
     for (var i = 0; i < posts.length; i++) {
         var timerID = "postPublishTime_" + posts[i].id;
 
@@ -69,7 +71,9 @@ function constructPosts(posts, comment_link = true) {
 
         var text =  '<div>' +
                     '    <div class="content-inner">' +
-                    '        <h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1>' +
+                    '        <table><td><input class="vote" type="image" src="/static/upvote.png" alt="up"><input class="vote" type="image" src="/static/downvote.png" alt="down"></td>' +
+                    '        <td><input class="vote" type="image" src="/static/favorite.png" alt="fav"></td>' +
+                    '        <td><h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1></td></table>' +
                     '        <p class="tiny">' +
                     '            <b class="interest0">Author:</b> ' + posts[i].author + '; <b class="interest1">Blog:</b> ' + posts[i].blog + '; <b class="interest2">Rating:</b> ' + posts[i].cachedRating + '; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> ' + posts[i].cachedSubscriptionsNumber + '; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
                     '            <b class="interest0">Tags:</b> ';
@@ -115,7 +119,8 @@ function constructBlogs(blogs) {
                    '        </div>' +
 
                    '        <div class="table-cell content-inner">' +
-                   '            <h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1>' +
+                   '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav"></td>' +
+                   '            <td><h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
                    '            <p class="tiny">' +
                    '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber  + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">; Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
                    '            </p>' +

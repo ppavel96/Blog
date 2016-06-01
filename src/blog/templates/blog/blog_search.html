@@ -1,0 +1,24 @@
+﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
+
+{% block title %}Posts of {{blog_name}}{% endblock %}
+
+{% block content %}
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item"><a href="/posts/new/">New</a></li>
+        <li class="content-header-item"><a href="/posts/best/">Best</a></li>
+        <li class="content-header-item"><a href="/posts/feed/">Feed</a></li>
+        <li class="content-header-item active"><a href="/blogs/{{category|slice:"5:"}}/">Posts of "{{blog_name}}"</a></li>
+    </ul>
+</nav>
+
+<div class="content height-600 content-inner" id="post_pool"></div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadPosts('{{category}}'); }
+</script>
+{% endblock %}

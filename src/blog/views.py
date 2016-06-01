@@ -5,22 +5,31 @@ from blog.models import *
 
 # Pages
 
-def posts(request, category = 'hot'):
-    return render(request, 'blog/posts.html', { 'navigation' : 'posts', 'category' : category })
+def posts(request, category = 'new'):
+    return render(request, 'blog/posts.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : category })
 
 def people(request):
-    return render(request, 'blog/people.html', { 'navigation' : 'people' })
+    return render(request, 'blog/people.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
 
 def blogs(request, category = 'best'):
-    return render(request, 'blog/blogs.html', { 'navigation' : 'blogs', 'category' : category })
+    return render(request, 'blog/blogs.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : category })
 
 def about(request):
-    return render(request, 'blog/about.html', { 'navigation' : 'about' })
+    return render(request, 'blog/about.html', { 'navigation' : 'about', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
 
 def comments(request, id = '0'):
     if Post.objects.filter(id=id).count() > 0:
-        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'post' : Post.objects.get(id=id) })
+        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id) })
     
+    return page_404(request)
+
+def search(request, tag = ''):
+    return render(request, 'blog/search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'tag_' + tag })
+
+def blog_search(request, blog = '0'):
+    if Blog.objects.filter(id=blog).count() > 0:
+        return render(request, 'blog/blog_search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'blog_' + blog, 'blog_name' : Blog.objects.get(id=blog).title })
+
     return page_404(request)
 
 
@@ -117,11 +126,18 @@ def posts_get(request):
     try:
         category = request.GET.get('category', '')
 
-        array = []
         if category == 'new':
             array = Post.objects.all().order_by('-publishedDate')
         if category == 'best':
             array = Post.objects.all().order_by('cachedRating')
+
+        if category[:4] == 'tag_':
+            actual_tag = Tag.objects.all().get(name=category[4:])
+            array = Post.objects.all().filter(tags__in=[actual_tag]).order_by('-publishedDate')
+
+        if category[:5] == 'blog_':
+            actual_blog = Blog.objects.all().get(id=category[5:])
+            array = Post.objects.all().filter(blog__in=[actual_blog]).order_by('-publishedDate')
 
         return JsonResponse(to_JSON(request, filter_posts(request, array)), safe=False)
 
@@ -133,9 +149,8 @@ def blogs_get(request):
     try:
         category = request.GET.get('category', '')
 
-        array = []
         if category == 'new':
-            array = Blog.objects.all().order_by('publishedDate')
+            array = Blog.objects.all().order_by('-publishedDate')
         if category == 'best':
             array = Blog.objects.all().order_by('cachedBlogRating')
 
@@ -298,6 +313,6 @@ def users_voteForComment(request):
 # 404 page
 
 def page_404(request):
-    response = render(request, 'blog/404.html', { 'navigation' : '404' })
+    response = render(request, 'blog/404.html', { 'navigation' : '404', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
     response.status_code = 404
     return response

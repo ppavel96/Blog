@@ -11,8 +11,12 @@ urlpatterns = [
 
     url(r'^posts/([0-9]+)/$', views.comments, name='comments'),
 
+    url(r'^tags/(.+)/$', views.search, name='search'),
+
     url(r'^blogs/$', RedirectView.as_view(url='/blogs/best/', permanent=True)),
     url(r'^blogs/(best|new|feed)/$', views.blogs, name='blogs'),
+
+    url(r'^blogs/([0-9]+)/$', views.blog_search, name='blog search'),
 
     url(r'^people/$', views.people, name='people'),
     url(r'^about/$', views.about, name='about'),
@@ -22,7 +26,7 @@ urlpatterns = [
 
     # API (GET)
 
-    url(r'^api/posts.get$', views.posts_get, name='api'), # posts.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only
+    url(r'^api/posts.get$', views.posts_get, name='api'), # posts.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only     P.S. category is new/best/feed or tag_.+ or blog_.+
     url(r'^api/blogs.get$', views.blogs_get, name='api'), # blogs.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of blogs in JSON or their ids only
     url(r'^api/users.get$', views.users_get, name='api'), # users.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
 
