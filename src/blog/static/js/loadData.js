@@ -1,26 +1,28 @@
-﻿function loadGeneric(url, request, callback) {
+﻿"use strict";
+function loadGeneric(url, request, callback) {
     if (loadGeneric.isLoading == undefined) {
         loadGeneric.isLoading = false;
         loadGeneric.startTime = (new Date(Date.now())).toISOString();
 
-        loadGeneric.noMore = {}
-        loadGeneric.nextID = {}
-        loadGeneric.loaded = {}
+        loadGeneric.noMore = {};
+        loadGeneric.nextID = {};
+        loadGeneric.loaded = {};
 
         loadGeneric.NEAR_BOTTOM_HEIGHT = 1000;
     }
 
     if (!loadGeneric.nextID.hasOwnProperty(url)) {
         loadGeneric.nextID[url] = 0;
-        loadGeneric.loaded[url] = {}
+        loadGeneric.loaded[url] = {};
     }
 
-    if (loadGeneric.noMore.hasOwnProperty(url))
+    if (loadGeneric.noMore.hasOwnProperty(url)) {
         return;
+    }
 
-    request['count'] = 5;
-    request['id'] = loadGeneric.nextID[url];
-    request['older'] = loadGeneric.startTime;
+    request.count = 5;
+    request.id = loadGeneric.nextID[url];
+    request.older = loadGeneric.startTime;
 
     if ((loadGeneric.nextID[url] == 0 || $(window).scrollTop() + $(window).height() > $(document).height() - loadGeneric.NEAR_BOTTOM_HEIGHT) && !loadGeneric.isLoading) {
         loadGeneric.isLoading = true;
@@ -29,13 +31,14 @@
             dataType: "json",
             url: url,
             data: request,
-            success: function(data) {
+            success: function (data) {
                 loadGeneric.nextID[url] += data.length;
-                if (data.length < request.count)
+                if (data.length < request.count) {
                     loadGeneric.noMore = true;
+                }
 
-                newdata = []
-                for (i = 0; i < data.length; i++) {
+                var newdata = [];
+                for (var i = 0; i < data.length; i += 1) {
                     if (!loadGeneric.loaded[url].hasOwnProperty(data[i].id)) {
                         loadGeneric.loaded[url][data[i].id] = true;
                         newdata.push(data[i]);
@@ -61,7 +64,7 @@ function loadBlogs(inCategory) {
 function constructPosts(posts, comment_link) {
     comment_link = typeof comment_link != 'undefined' ? comment_link : true;
 
-    for (var i = 0; i < posts.length; i++) {
+    for (var i = 0; i < posts.length; i += 1) {
         var timerID = "postPublishTime_" + posts[i].id;
 
         timersToUpdate.push({
@@ -78,7 +81,7 @@ function constructPosts(posts, comment_link) {
                     '            <b class="interest0">Author:</b> ' + posts[i].author + '; <b class="interest1">Blog:</b> ' + posts[i].blog + '; <b class="interest2">Rating:</b> ' + posts[i].cachedRating + '; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> ' + posts[i].cachedSubscriptionsNumber + '; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
                     '            <b class="interest0">Tags:</b> ';
 
-        for (var j = 0; j < posts[i].tags.length; ++j)
+        for (var j = 0; j < posts[i].tags.length; j += 1)
             text += posts[i].tags[j] + '; ';
 
         text +=     '        </p>' +
@@ -104,7 +107,7 @@ function constructPosts(posts, comment_link) {
 }
 
 function constructBlogs(blogs) {
-    for (var i = 0; i < blogs.length; i++) {
+    for (var i = 0; i < blogs.length; i += 1) {
         var timerID = "blogPublishTime_" + blogs[i].id;
 
         timersToUpdate.push({
@@ -113,7 +116,7 @@ function constructBlogs(blogs) {
         });
 
         var text = '<div>' +
-                   '    <div class="table">' + 
+                   '    <div class="table">' +
                    '        <div class="table-cell content-inner">' +
                    '            <img src="' + blogs[i].image + '" alt="Blog avatar" width="120" height="120" />' +
                    '        </div>' +
@@ -122,11 +125,11 @@ function constructBlogs(blogs) {
                    '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
                    '            <td><h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
                    '            <p class="tiny">' +
-                   '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber  + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">; Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
+                   '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">; Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
                    '            </p>' +
                    '            <br />' +
 
-                   '            <p>' + blogs[i].description + '</p>' + '<br />' + 
+                   '            <p>' + blogs[i].description + '</p>' + '<br />' +
                    '            <a href="/blogs/' + blogs[i].id + '/">Go to posts... </a>' +
                    '        </div>' +
                    '    </div>' +
@@ -139,9 +142,9 @@ function constructBlogs(blogs) {
     timersUpdate();
 }
 
-timersToUpdate = [];
+var timersToUpdate = [];
 function timersUpdate() {
-    for (var i = 0; i < timersToUpdate.length; i++) {
+    for (var i = 0; i < timersToUpdate.length; i += 1) {
         var mins = Math.floor((Date.now() - timersToUpdate[i].time) / 60000);
 
         if (mins >= 2880) {
