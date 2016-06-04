@@ -1,17 +1,25 @@
-﻿from django.shortcuts import render
-from django.http import JsonResponse
+﻿from django.shortcuts import render, redirect
+from django.http import JsonResponse, HttpResponse
+from django.contrib.auth import authenticate, login, logout
+
 from blog.models import *
 
 
 # Pages
 
 def posts(request, category = 'new'):
+    if not request.user.is_authenticated() and category == 'feed':
+        return redirect('/posts/new/')
+
     return render(request, 'blog/posts.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : category })
 
 def people(request):
     return render(request, 'blog/people.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
 
 def blogs(request, category = 'best'):
+    if not request.user.is_authenticated() and category == 'feed':
+        return redirect('/blogs/new/')
+
     return render(request, 'blog/blogs.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : category })
 
 def about(request):
@@ -31,6 +39,41 @@ def blog_search(request, blog = '0'):
         return render(request, 'blog/blog_search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'blog_' + blog, 'blog_name' : Blog.objects.get(id=blog).title })
 
     return page_404(request)
+
+def login_view(request):
+    if request.method == 'POST':
+        try:
+            username= request.POST.get('username')
+            password = request.POST.get('password')
+
+            user = authenticate(username=username, password=password)
+            if user is not None and user.is_active:
+                login(request, user)
+                return JsonResponse({ 'result' : 'ok' }, safe=False)
+            else:
+                return JsonResponse({ 'result' : 'incorrect' }, safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
+
+def logout_view(request):
+    if request.method == 'POST':
+        try:
+            logout(request)
+            return JsonResponse({ 'result' : 'ok' }, safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
+
+def register(request):
+    pass
+
+def profile(request):
+    pass
 
 
 # API (Helper functions)

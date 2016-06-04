@@ -9,7 +9,26 @@
 </div>
 
 <div class="content height-600 content-inner">
-    <p>Sorry, but we failed to find a page you were looking for. Maybe it was removed, moved to a better place or did never exist at all. Use menu bar to return to the main page</p>
+    <p>Sorry, but a page you were looking for could not be displayed.</p> 
+    <p>This could happen due to the following reasons:</p>
+    <p>- It has <b class="interest0">never existed</b></p>
+    <p>- It has been <b class="interest0">renamed</b> or <b class="interest0">moved</b> to a better place</p>
+    <p>- It has been <b class="interest0">deleted</b> or temporary <b class="interest0">disabled</b></p>
+    <p>- The requested address exists but appears to be <b class="interest0">not accessible</b> to you</p>
+    <br />
+    {% with ''|center:6050 as range %}
+        <p>
+            {% for _ in range %}
+                {% with rnd="11112"|make_list|random %}
+                    {% if rnd == "1" %}
+                        &nbsp;
+                    {% elif rnd == "2" %}
+                        :(
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </p>
+    {% endwith %}
 </div>
 
 {% endblock %}

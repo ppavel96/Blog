@@ -24,6 +24,11 @@ urlpatterns = [
     url(r'^robots.txt$', TemplateView.as_view(template_name='blog/robots.txt', content_type='text/plain')),
     url(r'^humans.txt$', TemplateView.as_view(template_name='blog/humans.txt', content_type='text/plain')),
 
+    url(r'^login/', views.login_view),
+    url(r'^logout/', views.logout_view),
+    url(r'^register/', views.register),
+    url(r'^profile/', views.profile),
+
     # API (GET)
 
     url(r'^api/posts.get$', views.posts_get, name='api'), # posts.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only     P.S. category is new/best/feed or tag_.+ or blog_.+

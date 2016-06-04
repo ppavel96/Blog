@@ -9,7 +9,7 @@
         <li class="content-header-item"><a href="/posts/new/">New</a></li>
         <li class="content-header-item"><a href="/posts/best/">Best</a></li>
         <li class="content-header-item"><a href="/posts/feed/">Feed</a></li>
-        <li class="content-header-item active"><a href="/tags/{{category|slice:"4:"}}/">Search by tag ({{category|slice:"4:14"}})</a></li>
+        <li class="content-header-item active"><a href="/tags/{{category|slice:"4:"}}/">Search by tag ({{category|slice:"4:14"}}{% if category|length > 14 %}...{% endif %})</a></li>
     </ul>
 </nav>
 

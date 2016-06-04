@@ -61,7 +61,8 @@ img {
 }
 
 .right-align-hack {
-    width: 890px;
+    width: 100500px;
+    padding-right: 20px;
 }
 
 .right-indent {
@@ -71,6 +72,15 @@ img {
 .right-align-text, .right-align-hack {
     text-align: right;
     padding-right: 20px;
+}
+
+td {
+    white-space: nowrap;
+}
+
+.center-caption {
+    text-align: center;
+    margin-bottom: 5px;
 }
 
 .content-header {
@@ -111,8 +121,12 @@ p, h1, h2, h3, h1 a, h2 a, h3 a {
     background: url('');
 }
 
-a, .nointerest {
+a, .nointerest, input[type="button"] {
     color: #aaaaaa;
+}
+
+.disabled {
+    color: #666666;
 }
 
 .interest0 {
@@ -152,7 +166,7 @@ h1 {
     font-size: 16px;
 }
 
-.active>a, a:focus, a:hover {
+.active>a, a:focus, a:hover, .active>input[type="button"], input[type="button"]:focus, input[type="button"]:hover {
     color: #ffffff;
 }
 
@@ -160,4 +174,73 @@ h1 {
     display: block;
     margin-right: 5px;
     margin-top: 4px;
+}
+
+.login-confirm {
+    margin-left: 74%;
+}
+
+.login-incorrect {
+    position: absolute;
+    display: none;
+}
+
+input[type="button"] {
+    background: none;
+    border: none;
+    display: inline;
+    font: inherit;
+    outline: none;
+    outline-offset: 0;
+    cursor: pointer;
+}
+
+.modal, .modal-login-content {
+    display: none;
+    z-index: 1;
+}
+
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    
+    animation-name: fadeout;
+    animation-duration: 0.3s;
+}
+
+.modal-login-content {
+    position: absolute;
+    
+    background-color: rgba(0,0,0,0.8);
+    border: 1px solid #ff2a00;
+    margin: 5px 0 0 625px;
+    padding: 10px;
+    width: 342px;
+    
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: fadeout;
+    animation-duration: 0.5s;
+}
+
+@keyframes fadeout {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+input[type="text"], input[type="password"] {
+    margin-left: 20px;
+    
+    font-family: "Open Sans", cursive, sans-serif;
+    font-size: 14px;
+    
+    padding-left: 10px;
+    
+    border: solid 0px #fff;
+    border-radius: 25px;
+    box-shadow: inset 1px 1px 2px 0 #707070;
+    transition: box-shadow 0.3s;
 }

@@ -8,7 +8,11 @@
     <ul>
         <li class="content-header-item {% if category == 'new' %}active{% endif %}"><a href="/posts/new/">New</a></li>
         <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/posts/best/">Best</a></li>
+        {% if user.is_authenticated %}
         <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/posts/feed/">Feed</a></li>
+        {% else %}
+        <li class="content-header-item disabled">Feed</li>
+        {% endif %}
     </ul>
 </nav>
 
