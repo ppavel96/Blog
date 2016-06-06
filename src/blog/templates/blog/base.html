@@ -15,8 +15,8 @@
 </head>
 
 <body>
-    <div id="background"> </div>
-    <nav class="content" role="navigation">
+    <div class="background"> </div>
+    <nav class="content margin-bottom" role="navigation">
         <ul class="content-header">
             <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts/new/">Posts</a></li>
             <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/best/">Blogs</a></li>
@@ -57,74 +57,68 @@
         </div>
     </div>
 
-    <div class="indent-needed">
-        <div class="content-left" role="main">
-            {% block content %}{% endblock %}
+    <div class="content-left" role="main">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="content-right">
+        <div class="content content-header">
+            <p class="content-header-item">Popular tags</p>
         </div>
 
-        <div class="content-right">
-            <div class="content content-header">
-                <p class="content-header-item">Popular tags</p>
-            </div>
+        <div class="content height-300">
+            <div class="content-inner">
+                <div class="table">
+                    <div class="table-cell">
+                        {% for i in tags|slice:":14" %}
+                            <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
+                        {% endfor %}
+                    </div>
 
-            <div class="content height-300">
-                <div class="content-inner">
-                    <div class="table">
-                        <div class="table-cell">
-                            {% for i in tags|slice:":14" %}
+                    <div class="table-cell">
+                        <div class="right-indent">
+                            {% for i in tags|slice:"14:28" %}
                                 <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
                             {% endfor %}
-                        </div>
-
-                        <div class="table-cell">
-                            <div class="right-indent">
-                                {% for i in tags|slice:"14:28" %}
-                                    <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
-                                {% endfor %}
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="content content-header">
-                <p class="content-header-item">Best comments</p>
+        <div class="content content-header">
+            <p class="content-header-item">Best comments</p>
+        </div>
+
+        <div class="content height-300">
+            <div class="content-inner">
             </div>
+        </div>
 
-            <div class="content height-300">
-                <div class="content-inner">
+        <div class="content content-header">
+            <p class="content-header-item">You may like</p>
+        </div>
 
-                </div>
+        <div class="content height-300">
+            <div class="content-inner">
             </div>
+        </div>
 
-            <div class="content content-header">
-                <p class="content-header-item">You may like</p>
+        <div class="content content-header">
+            <p class="content-header-item">Piece of info</p>
+        </div>
+
+        <div class="content height-300">
+            <div class="content-inner">
             </div>
+        </div>
 
-            <div class="content height-300">
-                <div class="content-inner">
+        <div class="content content-header">
+            <p class="content-header-item">Adverts</p>
+        </div>
 
-                </div>
-            </div>
-
-            <div class="content content-header">
-                <p class="content-header-item">Piece of info</p>
-            </div>
-
-            <div class="content height-300">
-                <div class="content-inner">
-
-                </div>
-            </div>
-
-            <div class="content content-header">
-                <p class="content-header-item">Adverts</p>
-            </div>
-
-            <div class="content height-300">
-                <div class="content-inner">
-
-                </div>
+        <div class="content height-300">
+            <div class="content-inner">
             </div>
         </div>
     </div>
@@ -150,6 +144,17 @@
                 $('#login-incorrect').hide();
             }
         };
+
+        var loginForm = document.getElementById("login-form");
+        var inputs = loginForm.getElementsByTagName("input");
+
+        for (var i = 0; i < inputs.length; i += 1) {
+            inputs[i].onkeypress = function(e) {
+                if (e.keyCode == 13) {
+                    login();
+                }
+            }
+        }
 
         // Log in
 

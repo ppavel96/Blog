@@ -1,3 +1,13 @@
+/* ------------------------------------------------------------ */
+/* ----------------------- MAIN STYLES ------------------------ */
+
+* {
+    text-decoration: none;
+    vertical-align: top;
+    padding: 0;
+    margin: 0;
+}
+
 body {
     font-family: "Open Sans", cursive, sans-serif;
     font-size: 16px;
@@ -10,12 +20,15 @@ body {
     background-color: #464646;
 }
 
-#background {
+.background {
     position: fixed;
-    top: 0;
-    left: 0;
+    
     width: 100%;
     height: 125%;
+    
+    top: 0;
+    left: 0;
+    
     z-index: -1;
     
     background: url(../background.jpg) no-repeat;
@@ -26,103 +39,36 @@ img {
     max-width: 650px;
 }
 
-.content {
-    background-color: rgba(0, 0, 0, 0.8);
-    margin: 0 15px 0 15px;
-}
-
-* {
-    text-decoration: none;
-    vertical-align: top;
-    padding: 0;
-    margin: 0;
-}
-
-.indent-needed {
-    margin-top: 15px;
-}
-
-.height-300 {
-    min-height: 300px;
-}
-
-.height-600 {
-    min-height: 1660px;
-}
-
-.content-left {
-    float: left;
-    width: 75%;
-}
-
-.content-right {
-    float: right;
-    width: 25%;
-}
-
-.right-align-hack {
-    width: 100500px;
-    padding-right: 20px;
-}
-
-.right-indent {
-    padding-left: 50px;
-}
-
-.right-align-text, .right-align-hack {
-    text-align: right;
-    padding-right: 20px;
-}
-
 td {
     white-space: nowrap;
 }
 
-.center-caption {
-    text-align: center;
-    margin-bottom: 5px;
+/* ------------------------------------------------------------ */
+/* ----------------------- FONTS ------------------------------ */
+
+h1, h2, h3 {
+    font-size: 16px;
+    
+    color: #ffffff;
+    background: url('');
 }
 
-.content-header {
-    padding: 0 20px 0 20px;
+.tiny {
+    font-size: 10px;
+    margin-top: 5px;
 }
 
-.table, .content-header {
-    display: table;
-}
-
-.content-header-item {
-    vertical-align: middle;
-    min-width: 120px;
-    height: 30px;
-}
-
-.table-cell, .content-header-item {
-    display: table-cell;
-}
-
-.content-right .content-header-item {
-    min-width: 150px;    
-    text-align: center;
-}
-
-.content-right .content-header {
-    margin-left: auto;
-}
-
-.content-inner {
-    padding: 10px 10px 10px 10px;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-p, h1, h2, h3, h1 a, h2 a, h3 a {
+p, h1 a, h2 a, h3 a {
     color: #ffffff;
     background: url('');
 }
 
 a, .nointerest, input[type="button"] {
     color: #aaaaaa;
+}
+
+.active>a, a:focus, a:hover, .active>input[type="button"], input[type="button"]:focus, input[type="button"]:hover {
+    color: #ffffff;
 }
 
 .disabled {
@@ -153,21 +99,96 @@ a, .nointerest, input[type="button"] {
     color: #ff6e00;
 }
 
+/* ------------------------------------------------------------ */
+/* ----------------------- CONTENT FLOW ----------------------- */
+
+.content-header {
+    padding: 0 20px 0 20px;
+}
+
+.content {
+    background-color: #000;
+    background-color: rgba(0, 0, 0, 0.8);
+    
+    margin: 0 15px 0 15px;
+}
+
+.content-inner {
+    padding: 10px 10px 10px 10px;
+    font-size: 14px;
+}
+
+.content-left {
+    float: left;
+    width: 75%;
+}
+
+.content-right {
+    float: right;
+    width: 25%;
+}
+
+.table, .content-header {
+    display: table;
+}
+
+.content-header-item {
+    vertical-align: middle;
+    min-width: 120px;
+    height: 30px;
+}
+
+.table-cell, .content-header-item {
+    display: table-cell;
+}
+
+.content-right .content-header-item {
+    min-width: 150px;    
+    text-align: center;
+}
+
+.content-right .content-header {
+    margin-left: auto;
+}
+
+.center-caption {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* ------------------------------------------------------------ */
+/* ----------------------- HACKS ------------------------------ */
+
+.height-300 {
+    min-height: 300px;
+}
+
+.height-1660 {
+    min-height: 1660px;
+}
+
+.right-align-hack {
+    width: 100500px;
+}
+
+.right-indent {
+    padding-left: 50px;
+}
+
+.right-align-text, .right-align-hack {
+    text-align: right;
+    padding-right: 20px;
+}
+
+.margin-bottom, .content-inner {
+    margin-bottom: 15px;
+}
+
+/* ------------------------------------------------------------ */
+/* ----------------------- GOOD STAFF ------------------------- */
+
 hr {
     border-color: #333333;
-}
-
-.tiny {
-    font-size: 10px;
-    margin-top: 5px;
-}
-
-h1 {
-    font-size: 16px;
-}
-
-.active>a, a:focus, a:hover, .active>input[type="button"], input[type="button"]:focus, input[type="button"]:hover {
-    color: #ffffff;
 }
 
 .vote {
@@ -176,24 +197,8 @@ h1 {
     margin-top: 4px;
 }
 
-.login-confirm {
-    margin-left: 74%;
-}
-
-.login-incorrect {
-    position: absolute;
-    display: none;
-}
-
-input[type="button"] {
-    background: none;
-    border: none;
-    display: inline;
-    font: inherit;
-    outline: none;
-    outline-offset: 0;
-    cursor: pointer;
-}
+/* ------------------------------------------------------------ */
+/* ----------------------- LOGIN FORM ------------------------- */
 
 .modal, .modal-login-content {
     display: none;
@@ -206,6 +211,8 @@ input[type="button"] {
     top: 0;
     width: 100%;
     height: 100%;
+    
+    background-color: #000;
     background-color: rgba(0,0,0,0.6);
     
     animation-name: fadeout;
@@ -215,21 +222,29 @@ input[type="button"] {
 .modal-login-content {
     position: absolute;
     
+    background-color: #000;
     background-color: rgba(0,0,0,0.8);
+    
     border: 1px solid #ff2a00;
-    margin: 5px 0 0 625px;
+    margin: -10px 0 0 625px;
     padding: 10px;
     width: 342px;
     
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     animation-name: fadeout;
     animation-duration: 0.5s;
 }
 
-@keyframes fadeout {
-    from {opacity: 0}
-    to {opacity: 1}
+.login-confirm {
+    margin-left: 74%;
 }
+
+.login-incorrect {
+    position: absolute;
+    display: none;
+}
+
+/* ------------------------------------------------------------ */
+/* ----------------------- INPUT FIELDS ----------------------- */
 
 input[type="text"], input[type="password"] {
     margin-left: 20px;
@@ -241,6 +256,28 @@ input[type="text"], input[type="password"] {
     
     border: solid 0 #fff;
     border-radius: 25px;
-    box-shadow: inset 1px 1px 2px 0 #707070;
+    
     transition: box-shadow 0.3s;
+}
+
+input[type="button"] {
+    background: none;
+    border: none;
+    display: inline;
+    font: inherit;
+    outline: none;
+    outline-offset: 0;
+    cursor: pointer;
+}
+
+input:-webkit-autofill {
+    box-shadow: 0 0 0 1000px #fff inset;
+}
+
+/* ------------------------------------------------------------ */
+/* ----------------------- ANIMATIONS ------------------------- */
+
+@keyframes fadeout {
+    from {opacity: 0}
+    to {opacity: 1}
 }
