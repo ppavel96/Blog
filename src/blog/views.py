@@ -1,6 +1,9 @@
 ﻿from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+
+import re, datetime
 
 from blog.models import *
 
@@ -43,7 +46,7 @@ def blog_search(request, blog = '0'):
 def login_view(request):
     if request.method == 'POST':
         try:
-            username= request.POST.get('username')
+            username = request.POST.get('username')
             password = request.POST.get('password')
 
             user = authenticate(username=username, password=password)
@@ -70,10 +73,109 @@ def logout_view(request):
     return page_404(request)
 
 def register(request):
-    pass
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            return redirect('/posts/new/')
 
-def profile(request):
-    pass
+        return render(request, 'blog/register.html', { 'navigation' : 'register', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
+    else:
+        try:
+            username = request.POST.get('username').strip()
+            email = request.POST.get('email').strip()
+
+            password = request.POST.get('password')
+            password_repeat = request.POST.get('password_repeat')
+
+            firstname = request.POST.get('firstname').strip()
+            lastname = request.POST.get('lastname').strip()
+
+            if len(username) < 2 or len(username) > 20:
+                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username\'s length should be between 2 and 20' }, safe=False)
+
+            if not re.match('[1-9|A-Z|a-z|_]+$', username):
+                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username contains invalid characters' }, safe=False)
+
+            if User.objects.filter(username=username).count() > 0:
+                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username is already in use' }, safe=False)
+
+            if not '@' in email:
+                return JsonResponse({ 'result' : 'emailError',    'message' : 'Email is invalid' }, safe=False)
+
+            if len(firstname) < 2 or len(firstname) > 20:
+                return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname\'s length should be between 2 and 20' }, safe=False)
+
+            if len(lastname) < 2 or len(lastname) > 20:
+                return JsonResponse({ 'result' : 'lastnameError', 'message' : 'Lastname\'s length should be between 2 and 20' }, safe=False)
+
+            if len(password) < 6:
+                return JsonResponse({ 'result' : 'passwordError', 'message' : 'Password should be at least 6 characters long' }, safe=False)
+
+            if password != password_repeat:
+                return JsonResponse({ 'result' : 'password_repeatError', 'message' : 'Passwords do not match' }, safe=False)
+
+            profile = Profile(dateOfBirth=datetime.datetime.now())
+
+            user = User.objects.create_user(username, email, password)
+            user.first_name = firstname
+            user.last_name = lastname
+
+            user.save()
+
+            profile.user = user;
+            profile.save()
+
+            user = authenticate(username=username, password=password)
+            login(request, user)
+
+            return JsonResponse({ 'result' : 'ok' }, safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+def profile(request, profile = '0'):
+    if Profile.objects.filter(id=profile).count() > 0:
+        if request.user.is_authenticated() and request.user.profile.id == int(profile):
+            return render(request, 'blog/profile.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+        else:
+            return render(request, 'blog/profile.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+
+    return page_404(request)
+
+def profile_activity(request, profile = '0'):
+    if Profile.objects.filter(id=profile).count() > 0:
+        if request.user.is_authenticated() and request.user.profile.id == int(profile):
+            return render(request, 'blog/profile_activity.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+        else:
+            return render(request, 'blog/profile_activity.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+
+    return page_404(request)
+
+def profile_followers(request, profile = '0'):
+    if Profile.objects.filter(id=profile).count() > 0:
+        if request.user.is_authenticated() and request.user.profile.id == int(profile):
+            return render(request, 'blog/profile_followers.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+        else:
+            return render(request, 'blog/profile_followers.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+
+    return page_404(request)
+
+def profile_subscriptions(request, profile = '0'):
+    if Profile.objects.filter(id=profile).count() > 0:
+        if request.user.is_authenticated() and request.user.profile.id == int(profile):
+            return render(request, 'blog/profile_subscriptions.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+        else:
+            return render(request, 'blog/profile_subscriptions.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+
+    return page_404(request)
+
+def profile_edit(request, profile = '0'):
+    if Profile.objects.filter(id=profile).count() > 0:
+        if request.user.is_authenticated() and request.user.profile.id == int(profile):
+            return render(request, 'blog/profile_edit.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+        else:
+            return redirect('/profile/' + profile + '/')
+
+    return page_404(request)
 
 
 # API (Helper functions)
@@ -173,6 +275,8 @@ def posts_get(request):
             array = Post.objects.all().order_by('-publishedDate')
         if category == 'best':
             array = Post.objects.all().order_by('cachedRating')
+        if category == 'feed':
+            array = Post.objects.all().filter(id=-1)
 
         if category[:4] == 'tag_':
             actual_tag = Tag.objects.all().get(name=category[4:])
@@ -181,6 +285,10 @@ def posts_get(request):
         if category[:5] == 'blog_':
             actual_blog = Blog.objects.all().get(id=category[5:])
             array = Post.objects.all().filter(blog__in=[actual_blog]).order_by('-publishedDate')
+
+        if category[:5] == 'user_':
+            actual_user = Profile.objects.all().get(id=category[5:]).user
+            array = Post.objects.all().filter(author__in=[actual_user]).order_by('-publishedDate')
 
         return JsonResponse(to_JSON(request, filter_posts(request, array)), safe=False)
 
@@ -196,6 +304,8 @@ def blogs_get(request):
             array = Blog.objects.all().order_by('-publishedDate')
         if category == 'best':
             array = Blog.objects.all().order_by('cachedBlogRating')
+        if category == 'feed':
+            array = Blog.objects.all().filter(id=-1)
 
         return JsonResponse(to_JSON(request, filter_blogs(request, array)), safe=False)
 

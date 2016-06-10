@@ -40,7 +40,10 @@ class Post(models.Model):
                  "cachedCommentsNumber" : self.cachedCommentsNumber,
                  "cachedSubscriptionsNumber" : self.cachedSubscriptionsNumber,
 
-                 "id" : self.id }
+                 "id" : self.id,
+                
+                 "author_id" : self.author.profile.id,
+                 "blog_id" : self.blog.id }
 
     # Publish
 
@@ -192,8 +195,9 @@ class Profile(models.Model):
 
     def to_JSON(self):
         return { 'username' : self.user.username,
-                 'firstName' : self.user.first_name,
-                 'lastName' : self.user.last_name,
+                 'firstname' : self.user.first_name,
+                 'lastname' : self.user.last_name,
+                 'registeredDate' : self.user.date_joined.isoformat(),
 
                  'image' : self.image,
 

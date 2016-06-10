@@ -2,7 +2,7 @@
 function loadGeneric(url, request, callback) {
     if (loadGeneric.isLoading == undefined) {
         loadGeneric.isLoading = false;
-        loadGeneric.startTime = (new Date(Date.now())).toISOString();
+        loadGeneric.startTime = new Date(Date.now()).toISOString();
 
         loadGeneric.noMore = {};
         loadGeneric.nextID = {};
@@ -20,11 +20,10 @@ function loadGeneric(url, request, callback) {
         return;
     }
 
-    request.count = 5;
     request.id = loadGeneric.nextID[url];
     request.older = loadGeneric.startTime;
 
-    if ((loadGeneric.nextID[url] == 0 || $(window).scrollTop() + $(window).height() > $(document).height() - loadGeneric.NEAR_BOTTOM_HEIGHT) && !loadGeneric.isLoading) {
+    if ((loadGeneric.nextID[url] == 0 || $(document).scrollTop() + $(window).height() > $(document).height() - loadGeneric.NEAR_BOTTOM_HEIGHT) && !loadGeneric.isLoading) {
         loadGeneric.isLoading = true;
 
         $.ajax({
@@ -54,11 +53,15 @@ function loadGeneric(url, request, callback) {
 }
 
 function loadPosts(inCategory) {
-    loadGeneric('/api/posts.get', { category: inCategory }, constructPosts);
+    loadGeneric('/api/posts.get', { category: inCategory, count: 5 }, constructPosts);
 }
 
 function loadBlogs(inCategory) {
-    loadGeneric('/api/blogs.get', { category: inCategory }, constructBlogs);
+    loadGeneric('/api/blogs.get', { category: inCategory, count: 5 }, constructBlogs);
+}
+
+function loadUsers() {
+    loadGeneric('/api/users.get', { count: 20 }, constructUsers);
 }
 
 function constructPosts(posts, comment_link) {
@@ -78,11 +81,11 @@ function constructPosts(posts, comment_link) {
                     '        <td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
                     '        <td><h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1></td></table>' +
                     '        <p class="tiny">' +
-                    '            <b class="interest0">Author:</b> ' + posts[i].author + '; <b class="interest1">Blog:</b> ' + posts[i].blog + '; <b class="interest2">Rating:</b> ' + posts[i].cachedRating + '; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> ' + posts[i].cachedSubscriptionsNumber + '; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
+                    '            <b class="interest0">Author:</b> <a class="usual" href="/profile/' + posts[i].author_id + '/">' + posts[i].author + '</a>; <b class="interest1">Blog:</b> <a class="usual" href="/blogs/' + posts[i].blog_id + '/">' +  posts[i].blog + '</a>; <b class="interest2">Rating:</b> ' + posts[i].cachedRating + '; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> ' + posts[i].cachedSubscriptionsNumber + '; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
                     '            <b class="interest0">Tags:</b> ';
 
         for (var j = 0; j < posts[i].tags.length; j += 1)
-            text += posts[i].tags[j] + '; ';
+            text += '<a class="usual" href="/tags/' + posts[i].tags[j] + '/">' + posts[i].tags[j] + '</a>; ';
 
         text +=     '        </p>' +
                     '        <br />';
@@ -118,14 +121,14 @@ function constructBlogs(blogs) {
         var text = '<div>' +
                    '    <div class="table">' +
                    '        <div class="table-cell content-inner">' +
-                   '            <img src="' + blogs[i].image + '" alt="Blog avatar" width="120" height="120" />' +
+                   '            <img class="margin-top" src="' + blogs[i].image + '" alt="Blog avatar" width="120" height="120" />' +
                    '        </div>' +
 
                    '        <div class="table-cell content-inner">' +
                    '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
                    '            <td><h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
                    '            <p class="tiny">' +
-                   '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">; Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
+                   '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
                    '            </p>' +
                    '            <br />' +
 
@@ -137,6 +140,35 @@ function constructBlogs(blogs) {
                    '<br><hr><br>';
 
         $("#blog_pool").append(text);
+    }
+
+    timersUpdate();
+}
+
+function constructUsers(users) {
+    for (var i = 0; i < users.length; i += 1) {
+        if (users[i].image == "") {
+            users[i].image = '/static/no_image.jpg';
+        }
+
+        var text = '<div>' +
+                   '    <div class="table">' +
+                   '        <div class="table-cell content-inner">' +
+                   '            <img class="margin-top" src="' + users[i].image + '" alt="User avatar" width="40" height="40" />' +
+                   '        </div>' +
+
+                   '        <div class="table-cell content-inner">' +
+                   '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
+                   '            <td><h1><a href="/profile/' + users[i].id + '/">' + users[i].username + ' (' + users[i].firstname + ' ' + users[i].lastname + ')</a></h1></td></table>' +
+                   '            <p class="tiny">' +
+                   '                <b class="interest0">Rating:</b> ' + users[i].cachedUserRating + '; <b class="interest1">Posts:</b> ' + users[i].cachedPostsNumber + '; <b class="interest2">Comments:</b> ' + users[i].cachedCommentsNumber + '; <b class="interest3">Followers:</b> ' + users[i].cachedFollowersNumber + '; <b  class="interest4">Registered:</b> ' + users[i].registeredDate.substring(0, 10) +
+                   '            </p>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '</div>' +
+                   '<hr>';
+
+        $("#user_pool").append(text);
     }
 
     timersUpdate();

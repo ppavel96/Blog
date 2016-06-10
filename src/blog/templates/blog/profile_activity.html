@@ -1,0 +1,27 @@
+﻿{% extends "blog/base.html" %}
+
+{% block title %}{{ profile.user.first_name }} {{ profile.user.last_name }}{% endblock %}
+
+{% block content %}
+
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/">Overview</a></li>
+        <li class="content-header-item active"><a href="/profile/{{ profile.id }}/activity/">Activity</a></li>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/followers/">Followers</a></li>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/subscriptions/">Subscriptions</a></li>
+        {% if user.is_authenticated and user.profile.id == profile.id %}
+        <li class="content-header-item right-align-text"><a class="interest1" href="/profile/{{ profile.id }}/edit/"><b>Edit</b></a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="content height-1660 content-inner">
+    <div class="post">
+        <div class="content-inner">
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,15 +1,21 @@
 ﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
 
 {% block title %}People{% endblock %}
 
 {% block content %}
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item active"><a href="/people/">By rating</a></li>
+    </ul>
+</nav>
 
-<div class="content content-header">
-    <p class="content-header-item">By rating</p>
-</div>
+<div class="content height-1660 content-inner" id="user_pool"></div>
+{% endblock %}
 
-<div class="content height-1660 content-inner">
-
-</div>
-
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadUsers(); }
+</script>
 {% endblock %}

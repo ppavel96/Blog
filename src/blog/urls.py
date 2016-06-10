@@ -24,14 +24,19 @@ urlpatterns = [
     url(r'^robots.txt$', TemplateView.as_view(template_name='blog/robots.txt', content_type='text/plain')),
     url(r'^humans.txt$', TemplateView.as_view(template_name='blog/humans.txt', content_type='text/plain')),
 
-    url(r'^login/', views.login_view),
-    url(r'^logout/', views.logout_view),
-    url(r'^register/', views.register),
-    url(r'^profile/', views.profile),
+    url(r'^login/$', views.login_view),
+    url(r'^logout/$', views.logout_view),
+    url(r'^register/$', views.register),
+
+    url(r'^profile/([0-9]+)/$', views.profile),
+    url(r'^profile/([0-9]+)/activity/$', views.profile_activity),
+    url(r'^profile/([0-9]+)/followers/$', views.profile_followers),
+    url(r'^profile/([0-9]+)/subscriptions/$', views.profile_subscriptions),
+    url(r'^profile/([0-9]+)/edit/$', views.profile_edit),
 
     # API (GET)
 
-    url(r'^api/posts.get$', views.posts_get, name='api'), # posts.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only     P.S. category is new/best/feed or tag_.+ or blog_.+
+    url(r'^api/posts.get$', views.posts_get, name='api'), # posts.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of posts in JSON or their ids only     P.S. category is new/best/feed or tag_.+ or blog_.+ or user_.+
     url(r'^api/blogs.get$', views.blogs_get, name='api'), # blogs.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of blogs in JSON or their ids only
     url(r'^api/users.get$', views.users_get, name='api'), # users.get(category, older, newwer, better, worse, id, count, return_only_ids) --> array of users in JSON or their ids only
 

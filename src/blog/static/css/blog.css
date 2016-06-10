@@ -71,6 +71,10 @@ a, .nointerest, input[type="button"] {
     color: #ffffff;
 }
 
+.usual {
+    color: #ffffff!important;
+}
+
 .disabled {
     color: #666666;
 }
@@ -184,6 +188,18 @@ a, .nointerest, input[type="button"] {
     margin-bottom: 15px;
 }
 
+.margin-left {
+    margin-left: 20px;
+}
+
+.margin-top {
+    margin-top: 5px;
+}
+
+.hidden {
+    display: none;
+}
+
 /* ------------------------------------------------------------ */
 /* ----------------------- GOOD STAFF ------------------------- */
 
@@ -225,7 +241,8 @@ hr {
     background-color: #000;
     background-color: rgba(0,0,0,0.8);
     
-    border: 1px solid #ff2a00;
+    box-shadow: 0 0 1pt 1pt red;
+    
     margin: -10px 0 0 625px;
     padding: 10px;
     width: 342px;
@@ -235,7 +252,7 @@ hr {
 }
 
 .login-confirm {
-    margin-left: 74%;
+    margin-left: 70%;
 }
 
 .login-incorrect {
@@ -246,18 +263,24 @@ hr {
 /* ------------------------------------------------------------ */
 /* ----------------------- INPUT FIELDS ----------------------- */
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], select {
     margin-left: 20px;
+    margin-right: 20px;
     
     font-family: "Open Sans", cursive, sans-serif;
     font-size: 14px;
     
     padding-left: 10px;
+    padding-right: 10px;
     
-    border: solid 0 #fff;
-    border-radius: 25px;
+    border: solid 0;
+    border-radius: 8px;
     
     transition: box-shadow 0.3s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    outline: none;
 }
 
 input[type="button"] {

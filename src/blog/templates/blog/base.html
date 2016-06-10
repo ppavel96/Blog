@@ -19,23 +19,25 @@
     <nav class="content margin-bottom" role="navigation">
         <ul class="content-header">
             <li class="content-header-item {% if navigation == 'posts' %}active{% endif %}"><a href="/posts/new/">Posts</a></li>
-            <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/best/">Blogs</a></li>
+            <li class="content-header-item {% if navigation == 'blogs' %}active{% endif %}"><a href="/blogs/new/">Blogs</a></li>
             <li class="content-header-item {% if navigation == 'people' %}active{% endif %}"><a href="/people/">People</a></li>
             <li class="content-header-item {% if navigation == 'about' %}active{% endif %}"><a href="/about/">About</a></li>
 
             {% if not user.is_authenticated %}
             <li class="content-header-item right-align-hack"><input type="button" id="modal-login-button" value="Log in" /></li>
-            <li class="content-header-item right-align-text"><a href="/">Register</a></li>
+            <li class="content-header-item right-align-text {% if navigation == 'register' %}active{% endif %}"><a href="/register/">Register</a></li>
             {% else %}
-            <li class="content-header-item right-align-hack"><a href="/">Profile ({{ user.username }})</a></li>
+            <li class="content-header-item right-align-hack {% if navigation == 'profile' %}active{% endif %}"><a href="/profile/{{ user.profile.id }}/">Profile ({{ user.username }})</a></li>
             <li class="content-header-item right-align-text"><input type="button" id="logout-button" value="Log out" onClick="logout();" /></li>
             {% endif %}
         </ul>
     </nav>
 
+    <noscript><div class="content content-inner"><h1 class="interest0">This site requires JavaScript enabled to work correctly</h1></div></noscript>
+
     <div id="modal" class="modal"></div>
     <div id="modal-login-content" class="modal-login-content">
-        <p class="center-caption"><b>Authentication</b></p>
+        <h1 class="center-caption">Authentication</h1>
         <div class="content">
             <form id="login-form" method="post">
                 {% csrf_token %}
@@ -50,7 +52,7 @@
                     </tr>
                     <tr>
                         <td><p id="login-incorrect" class="interest0 login-incorrect">Incorrect creditionals!</p></td>
-                        <td><input type="button" value="Confirm" class="login-confirm" onClick="login();" /></td>
+                        <td><input type="button" value="Confirm" class="usual login-confirm" onClick="login();" /></td>
                     </tr>
                 </table>
             </form>

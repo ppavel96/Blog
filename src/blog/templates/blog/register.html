@@ -1,0 +1,113 @@
+﻿{% extends "blog/base.html" %}
+
+{% block title %}Registration{% endblock %}
+
+{% block content %}
+
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item active"><a href="/register/">Registration</a></li>
+    </ul>
+</nav>
+
+<div class="content height-1660 content-inner">
+    <div class="post">
+        <div class="content-inner">
+            <form id="register-form" method="post" autocomplete="off">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td><p>Username</p></td>
+                        <td><input type="text" name="username" value=" " id="username" maxlength="20" /></td>
+                        <td><p id="usernameError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Email</p></td>
+                        <td><input type="text" name="email" maxlength="30" /></td>
+                        <td><p id="emailError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>First name</p></td>
+                        <td><input type="text" name="firstname" maxlength="20" /></td>
+                        <td><p id="firstnameError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Last name</p></td>
+                        <td><input type="text" name="lastname" maxlength="20" /></td>
+                        <td><p id="lastnameError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Password</p></td>
+                        <td><input type="password" name="password" maxlength="30" /></td>
+                        <td><p id="passwordError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Verify Password</p></td>
+                        <td><input type="password" name="password_repeat" maxlength="30" /></td>
+                        <td><p id="password_repeatError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><p class="margin-top">Avatar</p></td>
+                        <td><br /><img src="/static/no_image.jpg" alt="avatar" width="150" height="150" class="margin-left" /></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><input type="button" value="Register" class="usual" onClick="register();" /></td>
+                        <td></td><td></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var registerForm = document.getElementById("register-form");
+    var inputs = registerForm.getElementsByTagName("input");
+
+    for (var i = 0; i < inputs.length; i += 1) {
+        inputs[i].onkeypress = function (e) {
+            if (e.keyCode == 13) {
+                register();
+            }
+        }
+    }
+
+    function register() {
+        $.ajax({
+            type: "POST",
+            url: '/register/',
+            data: $('#register-form').serialize(),
+            success: function (response) {
+                if (response.result == 'ok')
+                    window.location = '/posts/new/';
+                else {
+                    $("#usernameError").text("");
+                    $("#emailError").text("");
+                    $("#firstnameError").text("");
+                    $("#lastnameError").text("");
+                    $("#passwordError").text("");
+                    $("#password_repeatError").text("");
+
+                    $('#' + response.result).text(response.message);
+                }
+            }
+        });
+    }
+
+    window.onload = function () {
+        setTimeout(function () {
+            $('#username').val("");
+        }, 1);
+    };
+</script>
+{% endblock %}
