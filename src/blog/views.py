@@ -2,6 +2,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 import re, datetime
 
@@ -36,6 +37,10 @@ def comments(request, id = '0'):
 
 def search(request, tag = ''):
     return render(request, 'blog/search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'tag_' + tag })
+
+def publications(request, user = '0'):
+    if Profile.objects.filter(id=user).count() > 0:
+        return render(request, 'blog/publications.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'user_' + user, 'user_name' : Profile.objects.get(id=user).user.username })
 
 def blog_search(request, blog = '0'):
     if Blog.objects.filter(id=blog).count() > 0:
@@ -90,25 +95,25 @@ def register(request):
             lastname = request.POST.get('lastname').strip()
 
             if len(username) < 2 or len(username) > 20:
-                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username\'s length should be between 2 and 20' }, safe=False)
+                return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username\'s length should be between 2 and 20' }, safe=False)
 
             if not re.match('[1-9|A-Z|a-z|_]+$', username):
-                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username contains invalid characters' }, safe=False)
+                return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username contains invalid characters' }, safe=False)
 
             if User.objects.filter(username=username).count() > 0:
-                return JsonResponse({ 'result' : 'usernameError', 'message' : 'Username is already in use' }, safe=False)
+                return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username is already in use' }, safe=False)
 
-            if not '@' in email:
-                return JsonResponse({ 'result' : 'emailError',    'message' : 'Email is invalid' }, safe=False)
+            if not re.match('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+                return JsonResponse({ 'result' : 'emailError',     'message' : 'Email is invalid' }, safe=False)
 
             if len(firstname) < 2 or len(firstname) > 20:
                 return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname\'s length should be between 2 and 20' }, safe=False)
 
             if len(lastname) < 2 or len(lastname) > 20:
-                return JsonResponse({ 'result' : 'lastnameError', 'message' : 'Lastname\'s length should be between 2 and 20' }, safe=False)
+                return JsonResponse({ 'result' : 'lastnameError',  'message' : 'Lastname\'s length should be between 2 and 20' }, safe=False)
 
             if len(password) < 6:
-                return JsonResponse({ 'result' : 'passwordError', 'message' : 'Password should be at least 6 characters long' }, safe=False)
+                return JsonResponse({ 'result' : 'passwordError',  'message' : 'Password should be at least 6 characters long' }, safe=False)
 
             if password != password_repeat:
                 return JsonResponse({ 'result' : 'password_repeatError', 'message' : 'Passwords do not match' }, safe=False)
@@ -135,18 +140,18 @@ def register(request):
 def profile(request, profile = '0'):
     if Profile.objects.filter(id=profile).count() > 0:
         if request.user.is_authenticated() and request.user.profile.id == int(profile):
-            return render(request, 'blog/profile.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+            return render(request, 'blog/profile.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile), 'is_subscribed' : Profile.objects.get(id=profile).is_followed_by(request.user) })
         else:
-            return render(request, 'blog/profile.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+            return render(request, 'blog/profile.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile), 'is_subscribed' : Profile.objects.get(id=profile).is_followed_by(request.user) })
 
     return page_404(request)
 
-def profile_activity(request, profile = '0'):
+def profile_favorites(request, profile = '0'):
     if Profile.objects.filter(id=profile).count() > 0:
         if request.user.is_authenticated() and request.user.profile.id == int(profile):
-            return render(request, 'blog/profile_activity.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+            return render(request, 'blog/profile_favorites.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
         else:
-            return render(request, 'blog/profile_activity.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+            return render(request, 'blog/profile_favorites.html', { 'navigation' : 'people', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
 
     return page_404(request)
 
@@ -262,21 +267,24 @@ def to_JSON(request, array):
     if return_only_ids == 1:
         return [i.id for i in array]
     else:
-        return [i.to_JSON() for i in array]
+        return [i.to_JSON(request.user) for i in array]
 
 
 # API (GET)
 
 def posts_get(request):
-    try:
+    #try:
         category = request.GET.get('category', '')
 
         if category == 'new':
             array = Post.objects.all().order_by('-publishedDate')
         if category == 'best':
-            array = Post.objects.all().order_by('cachedRating')
+            array = Post.objects.all().order_by('-cachedRating')
         if category == 'feed':
-            array = Post.objects.all().filter(id=-1)
+            if not request.user.is_authenticated():
+                array = Post.objects.filter(id=-1)
+            else:
+                array = Post.objects.filter(Q(author__profile__in=request.user.profile.followedUsers.all()) | Q(blog__in=request.user.profile.followedBlogs.all())).order_by('-publishedDate')
 
         if category[:4] == 'tag_':
             actual_tag = Tag.objects.all().get(name=category[4:])
@@ -292,7 +300,7 @@ def posts_get(request):
 
         return JsonResponse(to_JSON(request, filter_posts(request, array)), safe=False)
 
-    except:
+    #except:
         return JsonResponse(['Error'], safe=False)
 
 
@@ -303,9 +311,9 @@ def blogs_get(request):
         if category == 'new':
             array = Blog.objects.all().order_by('-publishedDate')
         if category == 'best':
-            array = Blog.objects.all().order_by('cachedBlogRating')
+            array = Blog.objects.all().order_by('-cachedBlogRating')
         if category == 'feed':
-            array = Blog.objects.all().filter(id=-1)
+            array = request.user.profile.followedBlogs.all().order_by('-cachedBlogRating')
 
         return JsonResponse(to_JSON(request, filter_blogs(request, array)), safe=False)
 
@@ -315,7 +323,7 @@ def blogs_get(request):
 
 def users_get(request):
     try:
-        return JsonResponse(to_JSON(request, filter_users(request, Profile.objects.all().order_by('cachedUserRating'))), safe=False)
+        return JsonResponse(to_JSON(request, filter_users(request, Profile.objects.all().order_by('-cachedUserRating'))), safe=False)
 
     except:
         return JsonResponse(['Error'], safe=False)
@@ -440,23 +448,136 @@ def users_getSubscriptionsForUsers(request):
 # API (POST)
 
 def users_subscribeForPost(request):
-    pass
+    if request.method == 'POST':
+        try:
+            post = Post.objects.get(id=request.POST.get('post_id', ''))
+            subscriber = Profile.objects.get(id=request.POST.get('subscriber_id', ''))
+            subscribe = request.POST.get('subscribe', '0')
+
+            if subscriber.followedPosts.filter(id=post.id).count() == 0 and subscribe == '1':
+                subscriber.cachedSubscriptionsForPostNumber += 1
+                post.cachedPostFollowersNumber += 1
+
+                subscriber.followedPosts.add(post)
+
+                subscriber.save()
+                post.save()
+
+            if subscriber.followedPosts.filter(id=post.id).count() > 0 and subscribe == '0':
+                subscriber.cachedSubscriptionsForPostNumber -= 1
+                post.cachedPostFollowersNumber -= 1
+
+                subscriber.followedPosts.remove(post)
+
+                subscriber.save()
+                post.save()
+
+            return JsonResponse({'result': 'ok'})
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
 
 
 def users_subscribeForBlog(request):
-    pass
+    if request.method == 'POST':
+        try:
+            blog = Blog.objects.get(id=request.POST.get('blog_id', ''))
+            subscriber = Profile.objects.get(id=request.POST.get('subscriber_id', ''))
+            subscribe = request.POST.get('subscribe', '0')
+
+            if subscriber.followedBlogs.filter(id=blog.id).count() == 0 and subscribe == '1':
+                subscriber.cachedSubscriptionsForBlogNumber += 1
+                blog.cachedMembersNumber += 1
+
+                subscriber.followedBlogs.add(blog)
+
+                subscriber.save()
+                blog.save()
+
+            if subscriber.followedBlogs.filter(id=blog.id).count() > 0 and subscribe == '0':
+                subscriber.cachedSubscriptionsForBlogNumber -= 1
+                blog.cachedMembersNumber -= 1
+
+                subscriber.followedBlogs.remove(blog)
+
+                subscriber.save()
+                blog.save()
+
+            return JsonResponse({'result': 'ok'})
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
 
 
 def users_subscribeForUser(request):
-    pass
+    if request.method == 'POST':
+        try:
+            user = Profile.objects.get(id=request.POST.get('user_id', ''))
+            subscriber = Profile.objects.get(id=request.POST.get('subscriber_id', ''))
+            subscribe = request.POST.get('subscribe', '0')
+
+            if subscriber.followedUsers.filter(id=user.id).count() == 0 and subscribe == '1':
+                subscriber.cachedSubscriptionsForUserNumber += 1
+                user.cachedFollowersNumber += 1
+
+                subscriber.followedUsers.add(user)
+
+                subscriber.save()
+                user.save()
+
+            if subscriber.followedUsers.filter(id=user.id).count() > 0 and subscribe == '0':
+                subscriber.cachedSubscriptionsForUserNumber -= 1
+                user.cachedFollowersNumber -= 1
+
+                subscriber.followedUsers.remove(user)
+
+                subscriber.save()
+                user.save()
+
+            return JsonResponse({'result': 'ok'})
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
 
 
 def users_voteForPost(request):
-    pass
+    if request.method == 'POST':
+        #try:
+            post = Post.objects.get(id=request.POST.get('post_id', ''))
+            user = Profile.objects.get(id=request.POST.get('user_id', ''))
+            like = int(request.POST.get('vote', '0'))
 
+            like = max(-1, min(1, like))
 
-def users_voteForBlog(request):
-    pass
+            if VoteForPost.objects.filter(user__profile=user, post=post).count() > 0:
+                vote = VoteForPost.objects.get(user__profile=user, post=post)
+                prev_like = vote.like
+                vote.like = like
+            else:
+                prev_like = 0
+                vote = VoteForPost(user=user.user, post=post, like=like)
+
+            post.cachedRating += like - prev_like
+            post.blog.cachedBlogRating += like - prev_like
+            post.author.profile.cachedUserRating += like - prev_like
+
+            post.save()
+            post.blog.save()
+            post.author.profile.save()
+            vote.save()
+
+            return JsonResponse({'result': 'ok'})
+
+        #except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
 
 
 def users_voteForComment(request):

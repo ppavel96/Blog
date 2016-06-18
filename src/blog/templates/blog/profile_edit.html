@@ -7,7 +7,7 @@
 <nav class="content content-header" role="navigation">
     <ul>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/">Overview</a></li>
-        <li class="content-header-item"><a href="/profile/{{ profile.id }}/activity/">Activity</a></li>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/favorites/">Favorites</a></li>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/followers/">Followers</a></li>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/subscriptions/">Subscriptions</a></li>
         {% if user.is_authenticated and user.profile.id == profile.id %}

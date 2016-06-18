@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^posts/([0-9]+)/$', views.comments, name='comments'),
 
     url(r'^tags/(.+)/$', views.search, name='search'),
+    url(r'^publications/([0-9]+)/$', views.publications, name='publications'),
 
     url(r'^blogs/$', RedirectView.as_view(url='/blogs/best/', permanent=True)),
     url(r'^blogs/(best|new|feed)/$', views.blogs, name='blogs'),
@@ -29,7 +30,7 @@ urlpatterns = [
     url(r'^register/$', views.register),
 
     url(r'^profile/([0-9]+)/$', views.profile),
-    url(r'^profile/([0-9]+)/activity/$', views.profile_activity),
+    url(r'^profile/([0-9]+)/favorites/$', views.profile_favorites),
     url(r'^profile/([0-9]+)/followers/$', views.profile_followers),
     url(r'^profile/([0-9]+)/subscriptions/$', views.profile_subscriptions),
     url(r'^profile/([0-9]+)/edit/$', views.profile_edit),
@@ -63,7 +64,6 @@ urlpatterns = [
     url(r'^api/users.subscribeForUser$', views.users_subscribeForUser, name='api'), # users.subscribeForUser(subscriber_id, user_id, subscribe)
 
     url(r'^api/users.voteForPost$', views.users_voteForPost, name='api'),           # users.voteForPost(user_id, post_id, vote)
-    url(r'^api/users.voteForBlog$', views.users_voteForBlog, name='api'),           # users.voteForBlog(user_id, post_id, vote)
     url(r'^api/users.voteForComment$', views.users_voteForComment, name='api'),     # users.voteForComment(user_id, post_id, vote)
 
     # 404 page

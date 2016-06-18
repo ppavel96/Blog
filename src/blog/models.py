@@ -15,19 +15,43 @@ class Post(models.Model):
 
     # Cached
 
-    cachedRating = models.PositiveIntegerField(default=0, editable=False)
-    cachedCommentsNumber = models.PositiveIntegerField(default=0, editable=False)
-    cachedSubscriptionsNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedRating = models.IntegerField(default=0)
+    cachedCommentsNumber = models.PositiveIntegerField(default=0)
+    cachedPostFollowersNumber = models.PositiveIntegerField(default=0)
 
     # JSON
 
-    def to_JSON(self):
+    def is_followed_by(self, user):
+        result = 0
+
+        if user.is_authenticated() and Profile.objects.filter(user=user).count() > 0:
+            profile = Profile.objects.get(user=user)
+            if profile.followedPosts.filter(id=self.id).count() > 0:
+                result = 1
+
+        return result
+
+
+    def get_vote(self, user):
+        result = 0
+
+        if user.is_authenticated() and VoteForPost.objects.filter(user=user, post__id=self.id).count() > 0:
+            vote = VoteForPost.objects.get(user=user, post__id=self.id)
+            result = vote.like
+
+        return result
+
+
+    def to_JSON(self, user):
         tags = list()
         for i in self.tags.all():
             tags.append(i.__str__())
 
         return { "author" : self.author.username,
                  "blog" : self.blog.__str__(),
+
+                 "is_subscribed" : self.is_followed_by(user),
+                 "vote" : self.get_vote(user),
 
                  "title" : self.title,
                  "content" : self.content,
@@ -38,7 +62,7 @@ class Post(models.Model):
 
                  "cachedRating" : self.cachedRating,
                  "cachedCommentsNumber" : self.cachedCommentsNumber,
-                 "cachedSubscriptionsNumber" : self.cachedSubscriptionsNumber,
+                 "cachedPostFollowersNumber" : self.cachedPostFollowersNumber,
 
                  "id" : self.id,
                 
@@ -58,7 +82,10 @@ class Post(models.Model):
 class VoteForPost(models.Model):
     user = models.ForeignKey('auth.User')
     post = models.ForeignKey('Post')
-    like = models.NullBooleanField()
+    like = models.SmallIntegerField(default=0)
+
+    def __str__(self):
+        return self.user.__str__() + ' - ' + self.post.__str__()
 
 
 class Tag(models.Model):
@@ -66,7 +93,7 @@ class Tag(models.Model):
 
     # Cached
 
-    cachedTagNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedTagNumber = models.PositiveIntegerField(default=0)
 
 
     def __str__(self):
@@ -91,11 +118,11 @@ class Comment(models.Model):
     
     # Cached
 
-    cachedRating = models.PositiveIntegerField(default=0)
+    cachedRating = models.IntegerField(default=0)
 
     # JSON
 
-    def to_JSON(self):
+    def to_JSON(self, user):
         return { 'author' : self.author.username,
                  'post' : self.post,
 
@@ -123,7 +150,7 @@ class Comment(models.Model):
 class VoteForComment(models.Model):
     user = models.ForeignKey('auth.User')
     comment = models.ForeignKey('Comment')
-    like = models.NullBooleanField()
+    like = models.SmallIntegerField(default=0)
 
 
 class Blog(models.Model):
@@ -138,14 +165,28 @@ class Blog(models.Model):
 
     # Cached
 
-    cachedBlogRating = models.PositiveIntegerField(default=0, editable=False)
-    cachedMembersNumber = models.PositiveIntegerField(default=0, editable=False)
-    cachedPostsNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedBlogRating = models.IntegerField(default=0)
+    cachedMembersNumber = models.PositiveIntegerField(default=0)
+    cachedPostsNumber = models.PositiveIntegerField(default=0)
 
     # JSON
 
-    def to_JSON(self):
+    def is_followed_by(self, user):
+        result = '0'
+
+        if user.is_authenticated() and Profile.objects.filter(user=user).count() > 0:
+            profile = Profile.objects.get(user=user)
+            if profile.followedBlogs.filter(id=self.id).count() > 0:
+                result = '1'
+
+        return result
+
+
+    def to_JSON(self, user):
         return { 'creator' : self.creator.username,
+                 'creator_id' : self.creator.profile.id,
+
+                 'is_subscribed' : self.is_followed_by(user),
 
                  'title' : self.title,
                  'image' : self.image,
@@ -180,24 +221,39 @@ class Profile(models.Model):
     
     # Cached
 
-    cachedUserRating = models.PositiveIntegerField(default=0, editable=False)
+    cachedUserRating = models.IntegerField(default=0)
 
-    cachedCommentsNumber = models.PositiveIntegerField(default=0, editable=False)
-    cachedPostsNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedCommentsNumber = models.PositiveIntegerField(default=0)
+    cachedPostsNumber = models.PositiveIntegerField(default=0)
 
-    cachedSubscriptionsForPostNumber = models.PositiveIntegerField(default=0, editable=False)
-    cachedSubscriptionsForBlogNumber = models.PositiveIntegerField(default=0, editable=False)
-    cachedSubscriptionsForUserNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedSubscriptionsForPostNumber = models.PositiveIntegerField(default=0)
+    cachedSubscriptionsForBlogNumber = models.PositiveIntegerField(default=0)
+    cachedSubscriptionsForUserNumber = models.PositiveIntegerField(default=0)
 
-    cachedFollowersNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedFollowersNumber = models.PositiveIntegerField(default=0)
 
     # JSON
 
-    def to_JSON(self):
+    def is_followed_by(self, user):
+        result = '0'
+
+        if user.is_authenticated() and Profile.objects.filter(user=user).count() > 0:
+            profile = Profile.objects.get(user=user)
+            if profile.followedUsers.filter(id=self.id).count() > 0:
+                result = '1'
+
+        return result
+
+
+    def to_JSON(self, user):
         return { 'username' : self.user.username,
                  'firstname' : self.user.first_name,
                  'lastname' : self.user.last_name,
+
                  'registeredDate' : self.user.date_joined.isoformat(),
+                 'last_login' : self.user.last_login.isoformat(),
+
+                 'is_subscribed' : self.is_followed_by(user),
 
                  'image' : self.image,
 

@@ -1,4 +1,5 @@
 ﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
 
 {% block title %}{{ profile.user.first_name }} {{ profile.user.last_name }}{% endblock %}
 
@@ -7,7 +8,7 @@
 <nav class="content content-header" role="navigation">
     <ul>
         <li class="content-header-item active"><a href="/profile/{{ profile.id }}/">Overview</a></li>
-        <li class="content-header-item"><a href="/profile/{{ profile.id }}/activity/">Activity</a></li>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/favorites/">Favorites</a></li>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/followers/">Followers</a></li>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/subscriptions/">Subscriptions</a></li>
         {% if user.is_authenticated and user.profile.id == profile.id %}
@@ -17,11 +18,97 @@
 </nav>
 
 <div class="content height-1660 content-inner">
-    <div class="post">
+    <div>
+        <div class="table">
+            <div class="table-cell content-inner">
+                {% if profile.image == "" %}
+                    <img class="margin-top" src="/static/no_image.jpg" alt="User avatar" width="120" height="120" />
+                {% else %}
+                    <img class="margin-top" src="{{ profile.image }}" alt="User avatar" width="120" height="120" />
+                {% endif %}
+            </div>
+
+            <div class="table-cell content-inner">
+                <table>
+                    <td>
+                        {% if is_subscribed == '1' %}
+                            <input class="vote" type="image" src="/static/favorite_pressed.png" alt="fav" data-fav="1" onclick="subscribeForUser(this, {{ profile.id }})" />
+                        {% else %}
+                            <input class="vote" type="image" src="/static/favorite.png" alt="fav" data-fav="0" onclick="subscribeForUser(this, {{ profile.id }})" />
+                        {% endif %}
+                    </td>
+                    <td>
+                        <h1><a href="/profile/{{ profile.id }}/">{{ profile.user.username }} ({{ profile.user.first_name }} {{ profile.user.last_name }})</a></h1>
+                    </td>
+                </table>
+
+                <p class="tiny">
+                    <b class="interest0">Rating:</b> {{ profile.cachedUserRating }}; <b class="interest1">Posts:</b> {{ profile.cachedPostsNumber }}; <b class="interest2">Comments:</b> {{ profile.cachedCommentsNumber }}; <b class="interest3">Followers:</b> <span id="user-followers{{ profile.id }}">{{ profile.cachedFollowersNumber }}</span>; <b  class="interest4">Registered:</b> {{ profile.user.date_joined.isoformat|slice:"0:10" }}
+                </p>
+
+                <blockquote>
+                    <p class="right-align-text">"As soon as the user leave some comments best of them will appear there"</p>
+                    <p class="right-align-text margin-right">--- left in some post</p>
+                </blockquote>
+            </div>
+        </div>
+
         <div class="content-inner">
-            
+            <table>
+                <tr>
+                    <td><h1>Personal info</h1></td>
+                </tr>
+
+                <tr>
+                    <td><p>Date of birth:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><p>Gender:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><p>Country:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><p>City:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><br /><h1>Social networks</h1></td>
+                </tr>
+                
+                <tr>
+                    <td><p>Facebook:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><p>Twitter:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><p>Vk:</p></td>
+                    <td><p class="margin-left nointerest">unknown</p></td>
+                </tr>
+
+                <tr>
+                    <td><br /><a href="/publications/{{ profile.id }}/">Go to publications... </a></td>
+                </tr>
+
+            </table>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
 {% endblock %}

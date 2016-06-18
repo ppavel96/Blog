@@ -64,6 +64,18 @@ function loadUsers() {
     loadGeneric('/api/users.get', { count: 20 }, constructUsers);
 }
 
+function loadFollowers(user_id) {
+    loadGeneric('/api/users.getFollowers', { count: 20, user_id: user_id }, constructUsers);
+}
+
+function loadSubscriptions(user_id) {
+    loadGeneric('/api/users.getSubscriptionsForUsers', { count: 20, user_id: user_id }, constructUsers);
+}
+
+function loadSubscriptionsForPosts(user_id) {
+    loadGeneric('/api/users.getSubscriptionsForPosts', { count: 20, user_id: user_id }, constructPosts);
+}
+
 function constructPosts(posts, comment_link) {
     comment_link = typeof comment_link != 'undefined' ? comment_link : true;
 
@@ -75,13 +87,20 @@ function constructPosts(posts, comment_link) {
             time: new Date(posts[i].publishedDate)
         });
 
+        var fav_data = posts[i].is_subscribed;
+        var fav_icon = fav_data == 1 ? '/static/favorite_pressed.png' : '/static/favorite.png';
+
+        var vote_data = posts[i].vote;
+        var upvote_icon = vote_data == 1 ? '/static/upvote_pressed.png' : '/static/upvote.png';
+        var downvote_icon = vote_data == -1 ? '/static/downvote_pressed.png' : '/static/downvote.png';
+
         var text =  '<div>' +
                     '    <div class="content-inner">' +
-                    '        <table><td><input class="vote" type="image" src="/static/upvote.png" alt="up" /><input class="vote" type="image" src="/static/downvote.png" alt="down" /></td>' +
-                    '        <td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
+                    '        <table><td><input class="vote" type="image" src="' + upvote_icon + '" alt="up" data-vote="' + vote_data + '" onclick="voteForPost(this, \'up\', ' + posts[i].id + ')" /><input class="vote" type="image" src="' + downvote_icon + '" alt="down" data-vote="' + vote_data + '" onclick="voteForPost(this, \'down\', ' + posts[i].id + ')" /></td>' +
+                    '        <td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForPost(this, ' + posts[i].id + ')" /></td>' +
                     '        <td><h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1></td></table>' +
                     '        <p class="tiny">' +
-                    '            <b class="interest0">Author:</b> <a class="usual" href="/profile/' + posts[i].author_id + '/">' + posts[i].author + '</a>; <b class="interest1">Blog:</b> <a class="usual" href="/blogs/' + posts[i].blog_id + '/">' +  posts[i].blog + '</a>; <b class="interest2">Rating:</b> ' + posts[i].cachedRating + '; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> ' + posts[i].cachedSubscriptionsNumber + '; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
+                    '            <b class="interest0">Author:</b> <a class="usual" href="/profile/' + posts[i].author_id + '/">' + posts[i].author + '</a>; <b class="interest1">Blog:</b> <a class="usual" href="/blogs/' + posts[i].blog_id + '/">' + posts[i].blog + '</a>; <b class="interest2">Rating:</b> <span id="post-rating' + posts[i].id + '">' + posts[i].cachedRating + '</span>; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> <span id="post-followers' + posts[i].id + '">' + posts[i].cachedPostFollowersNumber + '</span>; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
                     '            <b class="interest0">Tags:</b> ';
 
         for (var j = 0; j < posts[i].tags.length; j += 1)
@@ -118,6 +137,9 @@ function constructBlogs(blogs) {
             time: new Date(blogs[i].publishedDate)
         });
 
+        var fav_data = blogs[i].is_subscribed;
+        var fav_icon = fav_data == 1 ? '/static/favorite_pressed.png' : '/static/favorite.png';
+
         var text = '<div>' +
                    '    <div class="table">' +
                    '        <div class="table-cell content-inner">' +
@@ -125,10 +147,10 @@ function constructBlogs(blogs) {
                    '        </div>' +
 
                    '        <div class="table-cell content-inner">' +
-                   '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
+                   '            <table><td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForBlog(this, ' + blogs[i].id + ')" /></td>' +
                    '            <td><h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
                    '            <p class="tiny">' +
-                   '                <b class="interest0">Moderator: </b> ' + blogs[i].creator + '; <b class="interest1">Members:</b> ' + blogs[i].cachedMembersNumber + '; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
+                   '                <b class="interest0">Moderator:</b> <a class="usual" href="/profile/' + blogs[i].creator_id + '/">' + blogs[i].creator + '</a>; <b class="interest1">Members:</b> <span id="blog-followers' + blogs[i].id + '">' + blogs[i].cachedMembersNumber + '</span>; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
                    '            </p>' +
                    '            <br />' +
 
@@ -151,6 +173,9 @@ function constructUsers(users) {
             users[i].image = '/static/no_image.jpg';
         }
 
+        var fav_data = users[i].is_subscribed;
+        var fav_icon = fav_data == 1 ? '/static/favorite_pressed.png' : '/static/favorite.png';
+
         var text = '<div>' +
                    '    <div class="table">' +
                    '        <div class="table-cell content-inner">' +
@@ -158,10 +183,10 @@ function constructUsers(users) {
                    '        </div>' +
 
                    '        <div class="table-cell content-inner">' +
-                   '            <table><td><input class="vote" type="image" src="/static/favorite.png" alt="fav" /></td>' +
+                   '            <table><td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForUser(this, ' + users[i].id + ')" /></td>' +
                    '            <td><h1><a href="/profile/' + users[i].id + '/">' + users[i].username + ' (' + users[i].firstname + ' ' + users[i].lastname + ')</a></h1></td></table>' +
                    '            <p class="tiny">' +
-                   '                <b class="interest0">Rating:</b> ' + users[i].cachedUserRating + '; <b class="interest1">Posts:</b> ' + users[i].cachedPostsNumber + '; <b class="interest2">Comments:</b> ' + users[i].cachedCommentsNumber + '; <b class="interest3">Followers:</b> ' + users[i].cachedFollowersNumber + '; <b  class="interest4">Registered:</b> ' + users[i].registeredDate.substring(0, 10) +
+                   '                <b class="interest0">Rating:</b> ' + users[i].cachedUserRating + '; <b class="interest1">Posts:</b> ' + users[i].cachedPostsNumber + '; <b class="interest2">Comments:</b> ' + users[i].cachedCommentsNumber + '; <b class="interest3">Followers:</b> <span id="user-followers' + users[i].id + '">' + users[i].cachedFollowersNumber + '</span>; <b  class="interest4">Registered:</b> ' + users[i].registeredDate.substring(0, 10) +
                    '            </p>' +
                    '        </div>' +
                    '    </div>' +
@@ -172,6 +197,151 @@ function constructUsers(users) {
     }
 
     timersUpdate();
+}
+
+function voteForPost(btn, type, postId) {
+    if (!isAuthenticated()) {
+        $("#modal").show();
+        $("#modal-login-content").show();
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+        return;
+    }
+
+    var rating = parseInt($("#post-rating" + postId).text());
+    var prev = parseInt(btn.dataset.vote);
+
+    if (type == 'up') {
+        if (btn.dataset.vote == 1) {
+            btn.nextSibling.dataset.vote = btn.dataset.vote = 0;
+            btn.src = '/static/upvote.png';
+        } else {
+            btn.nextSibling.dataset.vote = btn.dataset.vote = 1;
+            btn.src = '/static/upvote_pressed.png';
+            btn.nextSibling.src = '/static/downvote.png';
+        }
+    } else {
+        if (btn.dataset.vote == -1) {
+            btn.previousSibling.dataset.vote = btn.dataset.vote = 0;
+            btn.src = '/static/downvote.png';
+        } else {
+            btn.previousSibling.dataset.vote = btn.dataset.vote = -1;
+            btn.src = '/static/downvote_pressed.png';
+            btn.previousSibling.src = '/static/upvote.png';
+        }
+    }
+
+    $("#post-rating" + postId).text(rating + parseInt(btn.dataset.vote) - prev);
+
+    $.ajax({
+        type: "POST",
+        url: '/api/users.voteForPost',
+        data: {
+            post_id: postId,
+            user_id: getMyId(),
+            vote: btn.dataset.vote,
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+        }
+    });
+}
+
+function subscribeForPost(btn, postId) {
+    if (!isAuthenticated()) {
+        $("#modal").show();
+        $("#modal-login-content").show();
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+        return;
+    }
+
+    var followers = parseInt($("#post-followers" + postId).text());
+
+    if (btn.dataset.fav == 1) {
+        btn.dataset.fav = 0;
+        btn.src = '/static/favorite.png';
+        $("#post-followers" + postId).text(followers - 1);
+    } else {
+        btn.dataset.fav = 1;
+        btn.src = '/static/favorite_pressed.png';
+        $("#post-followers" + postId).text(followers + 1);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: '/api/users.subscribeForPost',
+        data: {
+            post_id: postId,
+            subscriber_id: getMyId(),
+            subscribe: btn.dataset.fav,
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+        }
+    });
+}
+
+function subscribeForBlog(btn, blogId) {
+    if (!isAuthenticated()) {
+        $("#modal").show();
+        $("#modal-login-content").show();
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+        return;
+    }
+
+    var followers = parseInt($("#blog-followers" + blogId).text());
+
+    if (btn.dataset.fav == 1) {
+        btn.dataset.fav = 0;
+        btn.src = '/static/favorite.png';
+        $("#blog-followers" + blogId).text(followers - 1);
+    } else {
+        btn.dataset.fav = 1;
+        btn.src = '/static/favorite_pressed.png';
+        $("#blog-followers" + blogId).text(followers + 1);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: '/api/users.subscribeForBlog',
+        data: {
+            blog_id: blogId,
+            subscriber_id: getMyId(),
+            subscribe: btn.dataset.fav,
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+        }
+    });
+}
+
+function subscribeForUser(btn, userId) {
+    if (!isAuthenticated()) {
+        $("#modal").show();
+        $("#modal-login-content").show();
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+        return;
+    }
+
+    var followers = parseInt($("#user-followers" + userId).text());
+
+    if (btn.dataset.fav == 1) {
+        btn.dataset.fav = 0;
+        btn.src = '/static/favorite.png';
+        $("#user-followers" + userId).text(followers - 1);
+    } else {
+        btn.dataset.fav = 1;
+        btn.src = '/static/favorite_pressed.png';
+        $("#user-followers" + userId).text(followers + 1);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: '/api/users.subscribeForUser',
+        data: {
+            user_id: userId,
+            subscriber_id: getMyId(),
+            subscribe: btn.dataset.fav,
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+        }
+    });
 }
 
 var timersToUpdate = [];

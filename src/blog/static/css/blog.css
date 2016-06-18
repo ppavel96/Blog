@@ -75,32 +75,36 @@ a, .nointerest, input[type="button"] {
     color: #ffffff!important;
 }
 
+.bold {
+    font-weight: bold!important;
+}
+
 .disabled {
-    color: #666666;
+    color: #666666!important;
 }
 
 .interest0 {
-    color: #ff0000;
+    color: #ff0000!important;
 }
 
 .interest1 {
-    color: #ff2a00;
+    color: #ff2a00!important;
 }
 
 .interest2 {
-    color: #ff3b00;
+    color: #ff3b00!important;
 }
 
 .interest3 {
-    color: #ff4c00;
+    color: #ff4c00!important;
 }
 
 .interest4 {
-    color: #ff5d00;
+    color: #ff5d00!important;
 }
 
 .interest5 {
-    color: #ff6e00;
+    color: #ff6e00!important;
 }
 
 /* ------------------------------------------------------------ */
@@ -196,6 +200,10 @@ a, .nointerest, input[type="button"] {
     margin-top: 5px;
 }
 
+.margin-right {
+    margin-right: 10px;
+}
+
 .hidden {
     display: none;
 }
@@ -211,6 +219,11 @@ hr {
     display: block;
     margin-right: 5px;
     margin-top: 4px;
+}
+
+blockquote {
+    margin: 15px;
+    font-style: italic;
 }
 
 /* ------------------------------------------------------------ */
@@ -291,6 +304,10 @@ input[type="button"] {
     outline: none;
     outline-offset: 0;
     cursor: pointer;
+}
+
+input[type="image"] {
+    outline: none;
 }
 
 input:-webkit-autofill {

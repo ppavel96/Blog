@@ -1,4 +1,5 @@
 ﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
 
 {% block title %}{{ profile.user.first_name }} {{ profile.user.last_name }}{% endblock %}
 
@@ -7,7 +8,7 @@
 <nav class="content content-header" role="navigation">
     <ul>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/">Overview</a></li>
-        <li class="content-header-item"><a href="/profile/{{ profile.id }}/activity/">Activity</a></li>
+        <li class="content-header-item"><a href="/profile/{{ profile.id }}/favorites/">Favorites</a></li>
         <li class="content-header-item"><a href="/profile/{{ profile.id }}/followers/">Followers</a></li>
         <li class="content-header-item active"><a href="/profile/{{ profile.id }}/subscriptions/">Subscriptions</a></li>
         {% if user.is_authenticated and user.profile.id == profile.id %}
@@ -16,12 +17,12 @@
     </ul>
 </nav>
 
-<div class="content height-1660 content-inner">
-    <div class="post">
-        <div class="content-inner">
-            
-        </div>
-    </div>
-</div>
+<div class="content height-1660 content-inner" id="user_pool"></div>
+{% endblock %}
 
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadSubscriptions({{ profile.id }}); }
+</script>
 {% endblock %}
