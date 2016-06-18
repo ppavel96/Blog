@@ -61,22 +61,22 @@
 
                 <tr>
                     <td><p>Date of birth:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.dateOfBirth == "" %}unknown{% else %}{{ profile.dateOfBirth }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
                     <td><p>Gender:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.gender == "" %}unknown{% else %}{{ profile.gender }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
                     <td><p>Country:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.country == "" %}unknown{% else %}{{ profile.country }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
                     <td><p>City:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.city == "" %}unknown{% else %}{{ profile.city }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
@@ -85,17 +85,17 @@
                 
                 <tr>
                     <td><p>Facebook:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.facebook == "" %}unknown{% else %}{{ profile.facebook }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
                     <td><p>Twitter:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.twitter == "" %}unknown{% else %}{{ profile.twitter }}{% endif %}</p></td>
                 </tr>
 
                 <tr>
                     <td><p>Vk:</p></td>
-                    <td><p class="margin-left nointerest">unknown</p></td>
+                    <td><p class="margin-left nointerest">{% if profile.vk == "" %}unknown{% else %}{{ profile.vk }}{% endif %}</p></td>
                 </tr>
 
                 <tr>

@@ -17,51 +17,95 @@
                 {% csrf_token %}
                 <table>
                     <tr>
-                        <td><p>Username</p></td>
-                        <td><input type="text" name="username" value=" " id="username" maxlength="20" /></td>
-                        <td><p id="usernameError" class="interest0"></p></td>
+                        <td><br /><p>Avatar</p></td>
+                        <td><br /><img src="/static/no_image.jpg" alt="avatar" width="120" height="120" class="margin-left" /></td>
+                        <td>
+                            <br /><p><b>Quick note:</b></p>
+                            <p class="margin-top">1. The image size should not exceed <b class="interest0">2 mb</b></p>
+                            <p>2. Do provide polite image and personal info</p>
+                            <p>3. You'll <b class="interest0">not</b> be able to change a username</p>
+                            <p>4. Valid email can be used to restore a password</p>
+                            <p>5. Your email will stay <b class="interest0">private</b></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><p>Username</p></td>
+                        <td><br /><input type="text" name="username" value=" " maxlength="20" required placeholder="0-9, A-Z, a-z, _" /></td>
+                        <td><br /><p id="usernameError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Email</p></td>
-                        <td><input type="text" name="email" maxlength="30" /></td>
+                        <td><input type="text" name="email" maxlength="30" required placeholder="example@example.com" /></td>
                         <td><p id="emailError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>First name</p></td>
-                        <td><input type="text" name="firstname" maxlength="20" /></td>
+                        <td><input type="text" name="firstname" maxlength="20" required placeholder="A-Z, a-z" /></td>
                         <td><p id="firstnameError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Last name</p></td>
-                        <td><input type="text" name="lastname" maxlength="20" /></td>
+                        <td><input type="text" name="lastname" maxlength="20" required placeholder="A-Z, a-z" /></td>
                         <td><p id="lastnameError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Password</p></td>
-                        <td><input type="password" name="password" maxlength="30" /></td>
+                        <td><input type="password" name="password" maxlength="30" required /></td>
                         <td><p id="passwordError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Verify Password</p></td>
-                        <td><input type="password" name="password_repeat" maxlength="30" /></td>
+                        <td><input type="password" name="password_repeat" maxlength="30" required /></td>
                         <td><p id="password_repeatError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
-                        <td><br /><p class="margin-top">Avatar</p></td>
-                        <td><br /><img src="/static/no_image.jpg" alt="avatar" width="150" height="150" class="margin-left" /></td>
-                        <td>
-                            <br /><p><b>Quick note:</b></p>
-                            <p class="margin-top">1. The image size should not exceed <b class="interest0">2 mb</b></p>
-                            <p>2. Do provide polite image and personal info</p>
-                            <p>3. You'll not be able to change a username</p>
-                            <p>4. Valid email can be used to restore a password</p>
-                        </td>
+                        <td><br /><h1>Personal info</h1></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Date of birth:</p></td>
+                        <td><input type="text" name="birth" maxlength="10" placeholder="2016-01-31" /></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Gender:</p></td>
+                        <td><input type="text" name="gender" maxlength="6" placeholder='"Male" or "Female"' /></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Country:</p></td>
+                        <td><input type="text" name="country" maxlength="20" /></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>City:</p></td>
+                        <td><input type="text" name="city" maxlength="20" /></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><h1>Social networks</h1></td>
+                    </tr>
+                
+                    <tr>
+                        <td><p>Facebook:</p></td>
+                        <td><input type="text" name="facebook" maxlength="50" placeholder="https://www.facebook.com/..." /></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Twitter:</p></td>
+                        <td><input type="text" name="twitter" maxlength="50" placeholder="https://www.twitter.com/..." /></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Vk:</p></td>
+                        <td><input type="text" name="vk" maxlength="50" placeholder="https://www.vk.com/..." /></td>
                     </tr>
 
                     <tr>
@@ -105,6 +149,22 @@
                     $("#passwordError").text("");
                     $("#password_repeatError").text("");
 
+                    if (response.result != 'usernameError') {
+                        $("#usernameError").text("Ok");
+                        if (response.result != 'emailError') {
+                            $("#emailError").text("Ok");
+                            if (response.result != 'firstnameError') {
+                                $("#firstnameError").text("Ok");
+                                if (response.result != 'lastnameError') {
+                                    $("#lastnameError").text("Ok");
+                                    if (response.result != 'passwordError') {
+                                        $("#passwordError").text("Ok");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     $('#' + response.result).text(response.message);
                 }
             }
@@ -113,7 +173,7 @@
 
     window.onload = function () {
         setTimeout(function () {
-            $('#username').val("");
+            $('[name="username"]').val("");
         }, 1);
     };
 </script>

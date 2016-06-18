@@ -1,5 +1,7 @@
 ﻿from django.db import models
 from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import Coalesce, Value
 
 
 class Post(models.Model):
@@ -15,9 +17,15 @@ class Post(models.Model):
 
     # Cached
 
-    cachedRating = models.IntegerField(default=0)
-    cachedCommentsNumber = models.PositiveIntegerField(default=0)
-    cachedPostFollowersNumber = models.PositiveIntegerField(default=0)
+    cachedRating = models.IntegerField(default=0, editable=False)
+    cachedCommentsNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedPostFollowersNumber = models.PositiveIntegerField(default=0, editable=False)
+
+    def recache(self):
+        self.cachedRating = VoteForPost.objects.all().filter(post=self).aggregate(rating=Coalesce(Sum('like'), Value(0)))['rating']
+        self.cachedCommentsNumber = Comment.objects.all().filter(post=self).count()
+        self.cachedPostFollowersNumber = Profile.objects.all().filter(followedPosts__in=[self]).count()
+        self.save()
 
     # JSON
 
@@ -45,7 +53,7 @@ class Post(models.Model):
     def to_JSON(self, user):
         tags = list()
         for i in self.tags.all():
-            tags.append(i.__str__())
+            tags.append(i.name)
 
         return { "author" : self.author.username,
                  "blog" : self.blog.__str__(),
@@ -84,6 +92,9 @@ class VoteForPost(models.Model):
     post = models.ForeignKey('Post')
     like = models.SmallIntegerField(default=0)
 
+    def recache(self):
+        pass
+
     def __str__(self):
         return self.user.__str__() + ' - ' + self.post.__str__()
 
@@ -93,11 +104,14 @@ class Tag(models.Model):
 
     # Cached
 
-    cachedTagNumber = models.PositiveIntegerField(default=0)
+    cachedTagNumber = models.PositiveIntegerField(default=0, editable=False)
 
+    def recache(self):
+        self.cachedTagNumber = Post.objects.all().filter(tags__in=[self]).count()
+        self.save()
 
     def __str__(self):
-        return self.name
+        return self.name + ' (' + self.cachedTagNumber.__str__() + ')'
 
 
 class Comment(models.Model):
@@ -118,7 +132,11 @@ class Comment(models.Model):
     
     # Cached
 
-    cachedRating = models.IntegerField(default=0)
+    cachedRating = models.IntegerField(default=0, editable=False)
+
+    def recache(self):
+        self.cachedRating = VoteForComment.objects.all().filter(comment=self).aggregate(rating=Coalesce(Sum('like'), Value(0)))['rating']
+        self.save()
 
     # JSON
 
@@ -152,6 +170,9 @@ class VoteForComment(models.Model):
     comment = models.ForeignKey('Comment')
     like = models.SmallIntegerField(default=0)
 
+    def recache(self):
+        pass
+
 
 class Blog(models.Model):
     creator = models.ForeignKey('auth.User')
@@ -165,9 +186,15 @@ class Blog(models.Model):
 
     # Cached
 
-    cachedBlogRating = models.IntegerField(default=0)
-    cachedMembersNumber = models.PositiveIntegerField(default=0)
-    cachedPostsNumber = models.PositiveIntegerField(default=0)
+    cachedBlogRating = models.IntegerField(default=0, editable=False)
+    cachedMembersNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedPostsNumber = models.PositiveIntegerField(default=0, editable=False)
+
+    def recache(self):
+        self.cachedBlogRating = Post.objects.all().filter(blog=self).aggregate(blogRating=Coalesce(Sum('cachedRating'), Value(0)))['blogRating']
+        self.cachedMembersNumber = Profile.objects.all().filter(followedBlogs__in=[self]).count()
+        self.cachedPostsNumber = Post.objects.all().filter(blog=self).count()
+        self.save()
 
     # JSON
 
@@ -213,7 +240,13 @@ class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
     image = models.CharField(max_length=200, blank=True)
 
-    dateOfBirth = models.DateField()
+    dateOfBirth = models.CharField(max_length=10, default="", blank=True)
+    gender = models.CharField(max_length=6, default="", blank=True)
+    country = models.CharField(max_length=20, default="", blank=True)
+    city = models.CharField(max_length=20, default="", blank=True)
+    facebook = models.CharField(max_length=20, default="", blank=True)
+    twitter = models.CharField(max_length=20, default="", blank=True)
+    vk = models.CharField(max_length=20, default="", blank=True)
 
     followedUsers = models.ManyToManyField('Profile', blank=True)
     followedBlogs = models.ManyToManyField('Blog', blank=True)
@@ -221,16 +254,30 @@ class Profile(models.Model):
     
     # Cached
 
-    cachedUserRating = models.IntegerField(default=0)
+    cachedUserRating = models.IntegerField(default=0, editable=False)
 
-    cachedCommentsNumber = models.PositiveIntegerField(default=0)
-    cachedPostsNumber = models.PositiveIntegerField(default=0)
+    cachedCommentsNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedPostsNumber = models.PositiveIntegerField(default=0, editable=False)
 
-    cachedSubscriptionsForPostNumber = models.PositiveIntegerField(default=0)
-    cachedSubscriptionsForBlogNumber = models.PositiveIntegerField(default=0)
-    cachedSubscriptionsForUserNumber = models.PositiveIntegerField(default=0)
+    cachedSubscriptionsForPostNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedSubscriptionsForBlogNumber = models.PositiveIntegerField(default=0, editable=False)
+    cachedSubscriptionsForUserNumber = models.PositiveIntegerField(default=0, editable=False)
 
-    cachedFollowersNumber = models.PositiveIntegerField(default=0)
+    cachedFollowersNumber = models.PositiveIntegerField(default=0, editable=False)
+
+    def recache(self):
+        self.cachedUserRating = Post.objects.all().filter(author__profile=self).aggregate(rating=Coalesce(Sum('cachedRating'), Value(0)))['rating'] + Comment.objects.all().filter(author__profile=self).aggregate(rating=Coalesce(Sum('cachedRating'), Value(0)))['rating']
+
+        self.cachedCommentsNumber = Comment.objects.all().filter(author__profile=self).count()
+        self.cachedPostsNumber = Post.objects.all().filter(author__profile=self).count()
+
+        self.cachedSubscriptionsForPostNumber = self.followedPosts.count()
+        self.cachedSubscriptionsForBlogNumber = self.followedBlogs.count()
+        self.cachedSubscriptionsForUserNumber = self.followedUsers.count()
+
+        self.cachedFollowersNumber = Profile.objects.all().filter(followedUsers__in=[self]).count()
+
+        self.save()
 
     # JSON
 
@@ -257,7 +304,13 @@ class Profile(models.Model):
 
                  'image' : self.image,
 
-                 'dateOfBirth' : self.dateOfBirth.isoformat(),
+                 'dateOfBirth' : self.dateOfBirth,
+                 'gender' : self.gender,
+                 'country' : self.country,
+                 'city' : self.city,
+                 'facebook' : self.facebook,
+                 'twitter' : self.twitter,
+                 'vk' : self.vk,
 
                  'cachedUserRating' : self.cachedUserRating,
 

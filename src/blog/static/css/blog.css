@@ -180,7 +180,7 @@ a, .nointerest, input[type="button"] {
 }
 
 .right-indent {
-    padding-left: 50px;
+    padding-left: 30px;
 }
 
 .right-align-text, .right-align-hack {
@@ -206,6 +206,10 @@ a, .nointerest, input[type="button"] {
 
 .hidden {
     display: none;
+}
+
+.nowrap {
+    white-space: nowrap;
 }
 
 /* ------------------------------------------------------------ */

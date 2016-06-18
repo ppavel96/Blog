@@ -31,7 +31,7 @@ def about(request):
 
 def comments(request, id = '0'):
     if Post.objects.filter(id=id).count() > 0:
-        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id) })
+        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id), 'post_json' : Post.objects.get(id=id).to_JSON(request.user) })
     
     return page_404(request)
 
@@ -94,10 +94,19 @@ def register(request):
             firstname = request.POST.get('firstname').strip()
             lastname = request.POST.get('lastname').strip()
 
+            birth = request.POST.get('birth').strip()
+            gender = request.POST.get('gender').strip()
+            country = request.POST.get('country').strip()
+            city = request.POST.get('city').strip()
+
+            facebook = request.POST.get('facebook').strip()
+            twitter = request.POST.get('twitter').strip()
+            vk = request.POST.get('vk').strip()
+
             if len(username) < 2 or len(username) > 20:
                 return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username\'s length should be between 2 and 20' }, safe=False)
 
-            if not re.match('[1-9|A-Z|a-z|_]+$', username):
+            if not re.match('[0-9|A-Z|a-z|_]+$', username):
                 return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username contains invalid characters' }, safe=False)
 
             if User.objects.filter(username=username).count() > 0:
@@ -109,8 +118,14 @@ def register(request):
             if len(firstname) < 2 or len(firstname) > 20:
                 return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname\'s length should be between 2 and 20' }, safe=False)
 
+            if not re.match('[A-Z|a-z| ]+$', firstname):
+                return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname contains invalid characters' }, safe=False)
+
             if len(lastname) < 2 or len(lastname) > 20:
                 return JsonResponse({ 'result' : 'lastnameError',  'message' : 'Lastname\'s length should be between 2 and 20' }, safe=False)
+
+            if not re.match('[A-Z|a-z| ]+$', lastname):
+                return JsonResponse({ 'result' : 'lastnameError', 'message' : 'Lastname contains invalid characters' }, safe=False)
 
             if len(password) < 6:
                 return JsonResponse({ 'result' : 'passwordError',  'message' : 'Password should be at least 6 characters long' }, safe=False)
@@ -118,7 +133,7 @@ def register(request):
             if password != password_repeat:
                 return JsonResponse({ 'result' : 'password_repeatError', 'message' : 'Passwords do not match' }, safe=False)
 
-            profile = Profile(dateOfBirth=datetime.datetime.now())
+            profile = Profile(dateOfBirth=birth, gender=gender, country=country, city=city, facebook=facebook, twitter=twitter, vk=vk)
 
             user = User.objects.create_user(username, email, password)
             user.first_name = firstname
@@ -273,7 +288,7 @@ def to_JSON(request, array):
 # API (GET)
 
 def posts_get(request):
-    #try:
+    try:
         category = request.GET.get('category', '')
 
         if category == 'new':
@@ -300,7 +315,7 @@ def posts_get(request):
 
         return JsonResponse(to_JSON(request, filter_posts(request, array)), safe=False)
 
-    #except:
+    except:
         return JsonResponse(['Error'], safe=False)
 
 
@@ -548,7 +563,7 @@ def users_subscribeForUser(request):
 
 def users_voteForPost(request):
     if request.method == 'POST':
-        #try:
+        try:
             post = Post.objects.get(id=request.POST.get('post_id', ''))
             user = Profile.objects.get(id=request.POST.get('user_id', ''))
             like = int(request.POST.get('vote', '0'))
@@ -574,7 +589,7 @@ def users_voteForPost(request):
 
             return JsonResponse({'result': 'ok'})
 
-        #except:
+        except:
             return JsonResponse(['Error'], safe=False)
 
     return page_404(request)

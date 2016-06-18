@@ -19,6 +19,6 @@
 {% block scripts %}
 <script defer src="{%  static 'js/loadData.js' %}"></script>
 <script>
-    window.onload = function () { constructPosts([ {{ post.to_JSON|safe }} ], false); }
+    window.onload = function () { constructPosts([ {{ post_json|safe }} ], false); }
 </script>
 {% endblock %}

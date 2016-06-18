@@ -72,42 +72,33 @@
             <div class="content-inner">
                 <div class="table">
                     <div class="table-cell">
-                        {% for i in tags|slice:":14" %}
-                            <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
+                        {% for i in tags|dictsortreversed:"cachedTagNumber" %}
+                            {% if not forloop.counter|divisibleby:"2" %}
+                                {% if i.cachedTagNumber > 0 %}
+                                    <p class="nowrap"><a href="/tags/{{i.name}}">{{ i }}</a></p>
+                                {% endif %}
+                            {% endif %}
                         {% endfor %}
                     </div>
 
                     <div class="table-cell">
                         <div class="right-indent">
-                            {% for i in tags|slice:"14:28" %}
-                                <p><a href="/tags/{{i.name}}">{{ i.name }}</a></p>
+                            {% for i in tags|dictsortreversed:"cachedTagNumber" %}
+                                {% if forloop.counter|divisibleby:"2" %}
+                                    {% if i.cachedTagNumber > 0 %}
+                                        <p class="nowrap"><a href="/tags/{{i.name}}">{{ i }}</a></p>
+                                    {% endif %}
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>
                 </div>
+                <br />
             </div>
         </div>
 
         <div class="content content-header">
             <p class="content-header-item">Best comments</p>
-        </div>
-
-        <div class="content height-300">
-            <div class="content-inner">
-            </div>
-        </div>
-
-        <div class="content content-header">
-            <p class="content-header-item">You may like</p>
-        </div>
-
-        <div class="content height-300">
-            <div class="content-inner">
-            </div>
-        </div>
-
-        <div class="content content-header">
-            <p class="content-header-item">Piece of info</p>
         </div>
 
         <div class="content height-300">
