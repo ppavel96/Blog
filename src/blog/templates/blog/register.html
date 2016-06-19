@@ -13,18 +13,24 @@
 <div class="content height-1660 content-inner">
     <div class="post">
         <div class="content-inner">
-            <form id="register-form" method="post" autocomplete="off">
+            <form id="register-form" method="post" autocomplete="off" >
                 {% csrf_token %}
                 <table>
                     <tr>
                         <td><br /><p>Avatar</p></td>
-                        <td><br /><img src="/static/no_image.jpg" alt="avatar" width="120" height="120" class="margin-left" /></td>
+
+                        <td>
+                            <br />
+                            <label for="file-input"><img src="/static/no_image.jpg" alt="avatar" width="120" height="120" class="margin-left" id="avatar" /></label>
+                            <input id="file-input" type="file" name="avatar" class="hidden" onchange="readURL(this);" accept="image/*" />
+                        </td>
+
                         <td>
                             <br /><p><b>Quick note:</b></p>
-                            <p class="margin-top">1. The image size should not exceed <b class="interest0">2 mb</b></p>
-                            <p>2. Do provide polite image and personal info</p>
-                            <p>3. You'll <b class="interest0">not</b> be able to change a username</p>
-                            <p>4. Valid email can be used to restore a password</p>
+                            <p class="margin-top">1. The image size should not exceed <b class="interest0">500 KB</b></p>
+                            <p>2. Do provide <b class="interest0">polite</b> image and personal info</p>
+                            <p>3. You'll not be able to <b class="interest0">change</b> a username</p>
+                            <p>4. You can leave info and social nets fields <b class="interest0">empty</b></p>
                             <p>5. Your email will stay <b class="interest0">private</b></p>
                         </td>
                     </tr>
@@ -72,21 +78,25 @@
                     <tr>
                         <td><p>Date of birth:</p></td>
                         <td><input type="text" name="birth" maxlength="10" placeholder="2016-01-31" /></td>
+                        <td><p id="birthError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Gender:</p></td>
                         <td><input type="text" name="gender" maxlength="6" placeholder='"Male" or "Female"' /></td>
+                        <td><p id="genderError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Country:</p></td>
-                        <td><input type="text" name="country" maxlength="20" /></td>
+                        <td><input type="text" name="country" maxlength="20" placeholder="A-Z, a-z" /></td>
+                        <td><p id="countryError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>City:</p></td>
-                        <td><input type="text" name="city" maxlength="20" /></td>
+                        <td><input type="text" name="city" maxlength="20" placeholder="A-Z, a-z" /></td>
+                        <td><p id="cityError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
@@ -96,16 +106,19 @@
                     <tr>
                         <td><p>Facebook:</p></td>
                         <td><input type="text" name="facebook" maxlength="50" placeholder="https://www.facebook.com/..." /></td>
+                        <td><p id="facebookError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Twitter:</p></td>
                         <td><input type="text" name="twitter" maxlength="50" placeholder="https://www.twitter.com/..." /></td>
+                        <td><p id="twitterError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p>Vk:</p></td>
                         <td><input type="text" name="vk" maxlength="50" placeholder="https://www.vk.com/..." /></td>
+                        <td><p id="vkError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
@@ -135,40 +148,46 @@
 
     function register() {
         $.ajax({
+            dataType: "json",
             type: "POST",
+            contentType: false,
+            processData: false,
             url: '/register/',
-            data: $('#register-form').serialize(),
+            data: new FormData($('#register-form')[0]),
             success: function (response) {
-                if (response.result == 'ok')
+                if (response.result == 'ok') {
                     window.location = '/posts/new/';
-                else {
-                    $("#usernameError").text("");
-                    $("#emailError").text("");
-                    $("#firstnameError").text("");
-                    $("#lastnameError").text("");
-                    $("#passwordError").text("");
-                    $("#password_repeatError").text("");
+                } else {
+                    var errors = ["usernameError", "emailError", "firstnameError", "lastnameError", "passwordError", "password_repeatError",
+                        "birthError", "genderError", "countryError", "cityError", "facebookError", "twitterError", "vkError"];
 
-                    if (response.result != 'usernameError') {
-                        $("#usernameError").text("Ok");
-                        if (response.result != 'emailError') {
-                            $("#emailError").text("Ok");
-                            if (response.result != 'firstnameError') {
-                                $("#firstnameError").text("Ok");
-                                if (response.result != 'lastnameError') {
-                                    $("#lastnameError").text("Ok");
-                                    if (response.result != 'passwordError') {
-                                        $("#passwordError").text("Ok");
-                                    }
-                                }
+                    for (var i = 0; i < errors.length; i += 1) {
+                        if (response.result != errors[i]) {
+                            $('#' + errors[i]).text("Ok");
+                        } else {
+                            $('#' + errors[i]).text(response.message);
+                            for (var j = i + 1; j < errors.length; j += 1) {
+                                $('#' + errors[j]).text("");
                             }
+
+                            break;
                         }
                     }
-
-                    $('#' + response.result).text(response.message);
                 }
             }
         });
+    }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#avatar').attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     window.onload = function () {

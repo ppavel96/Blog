@@ -21,10 +21,10 @@
     <div>
         <div class="table">
             <div class="table-cell content-inner">
-                {% if profile.image == "" %}
+                {% if profile.image.name == "" %}
                     <img class="margin-top" src="/static/no_image.jpg" alt="User avatar" width="120" height="120" />
                 {% else %}
-                    <img class="margin-top" src="{{ profile.image }}" alt="User avatar" width="120" height="120" />
+                    <img class="margin-top" src="{{ profile.image.url }}" alt="User avatar" width="120" height="120" />
                 {% endif %}
             </div>
 

@@ -98,13 +98,13 @@ function constructPosts(posts, comment_link) {
                     '    <div class="content-inner">' +
                     '        <table><td><input class="vote" type="image" src="' + upvote_icon + '" alt="up" data-vote="' + vote_data + '" onclick="voteForPost(this, \'up\', ' + posts[i].id + ')" /><input class="vote" type="image" src="' + downvote_icon + '" alt="down" data-vote="' + vote_data + '" onclick="voteForPost(this, \'down\', ' + posts[i].id + ')" /></td>' +
                     '        <td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForPost(this, ' + posts[i].id + ')" /></td>' +
-                    '        <td><h1><a href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1></td></table>' +
+                    '        <td><h1><a target="_blank" href="/posts/' + posts[i].id + '/">' + posts[i].title + '</a></h1></td></table>' +
                     '        <p class="tiny">' +
-                    '            <b class="interest0">Author:</b> <a class="usual" href="/profile/' + posts[i].author_id + '/">' + posts[i].author + '</a>; <b class="interest1">Blog:</b> <a class="usual" href="/blogs/' + posts[i].blog_id + '/">' + posts[i].blog + '</a>; <b class="interest2">Rating:</b> <span id="post-rating' + posts[i].id + '">' + posts[i].cachedRating + '</span>; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> <span id="post-followers' + posts[i].id + '">' + posts[i].cachedPostFollowersNumber + '</span>; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
+                    '            <b class="interest0">Author:</b> <a class="usual" target="_blank" href="/profile/' + posts[i].author_id + '/">' + posts[i].author + '</a>; <b class="interest1">Blog:</b> <a class="usual" target="_blank" href="/blogs/' + posts[i].blog_id + '/">' + posts[i].blog + '</a>; <b class="interest2">Rating:</b> <span id="post-rating' + posts[i].id + '">' + posts[i].cachedRating + '</span>; <b class="interest3">Comments:</b> ' + posts[i].cachedCommentsNumber + '; <b class="interest4">Followed by:</b> <span id="post-followers' + posts[i].id + '">' + posts[i].cachedPostFollowersNumber + '</span>; <b class="interest5">Published:</b> <span id="' + timerID + '"></span>' + '<br>' +
                     '            <b class="interest0">Tags:</b> ';
 
         for (var j = 0; j < posts[i].tags.length; j += 1)
-            text += '<a class="usual" href="/tags/' + posts[i].tags[j] + '/">' + posts[i].tags[j] + '</a>; ';
+            text += '<a class="usual" target="_blank" href="/tags/' + posts[i].tags[j] + '/">' + posts[i].tags[j] + '</a>; ';
 
         text +=     '        </p>' +
                     '        <br />';
@@ -113,7 +113,7 @@ function constructPosts(posts, comment_link) {
 
         if (comment_link)
             text += '    <br>' +
-                    '    <a href="/posts/' + posts[i].id + '/">Go to comments... </a>';
+                    '    <a target="_blank" href="/posts/' + posts[i].id + '/">Go to comments... </a>';
 
         text +=     '    </div>' +
                     '</div>' +
@@ -148,14 +148,14 @@ function constructBlogs(blogs) {
 
                    '        <div class="table-cell content-inner">' +
                    '            <table><td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForBlog(this, ' + blogs[i].id + ')" /></td>' +
-                   '            <td><h1><a href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
+                   '            <td><h1><a target="_blank" href="/blogs/' + blogs[i].id + '/">' + blogs[i].title + '</a></h1></td></table>' +
                    '            <p class="tiny">' +
-                   '                <b class="interest0">Moderator:</b> <a class="usual" href="/profile/' + blogs[i].creator_id + '/">' + blogs[i].creator + '</a>; <b class="interest1">Members:</b> <span id="blog-followers' + blogs[i].id + '">' + blogs[i].cachedMembersNumber + '</span>; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
+                   '                <b class="interest0">Moderator:</b> <a class="usual" target="_blank" href="/profile/' + blogs[i].creator_id + '/">' + blogs[i].creator + '</a>; <b class="interest1">Members:</b> <span id="blog-followers' + blogs[i].id + '">' + blogs[i].cachedMembersNumber + '</span>; <b class="interest2">Rating:</b> ' + blogs[i].cachedBlogRating + '; <b class="interest3">Posts:</b> ' + blogs[i].cachedPostsNumber + '; <b  class="interest4">Created:</b> <span id="' + timerID + '"></span>' +
                    '            </p>' +
                    '            <br />' +
 
                    '            <p>' + blogs[i].description + '</p>' + '<br />' +
-                   '            <a href="/blogs/' + blogs[i].id + '/">Go to posts... </a>' +
+                   '            <a target="_blank" href="/blogs/' + blogs[i].id + '/">Go to posts... </a>' +
                    '        </div>' +
                    '    </div>' +
                    '</div>' +
@@ -184,7 +184,7 @@ function constructUsers(users) {
 
                    '        <div class="table-cell content-inner">' +
                    '            <table><td><input class="vote" type="image" src="' + fav_icon + '" alt="fav" data-fav="' + fav_data + '" onclick="subscribeForUser(this, ' + users[i].id + ')" /></td>' +
-                   '            <td><h1><a href="/profile/' + users[i].id + '/">' + users[i].username + ' (' + users[i].firstname + ' ' + users[i].lastname + ')</a></h1></td></table>' +
+                   '            <td><h1><a target="_blank" href="/profile/' + users[i].id + '/">' + users[i].username + ' (' + users[i].firstname + ' ' + users[i].lastname + ')</a></h1></td></table>' +
                    '            <p class="tiny">' +
                    '                <b class="interest0">Rating:</b> ' + users[i].cachedUserRating + '; <b class="interest1">Posts:</b> ' + users[i].cachedPostsNumber + '; <b class="interest2">Comments:</b> ' + users[i].cachedCommentsNumber + '; <b class="interest3">Followers:</b> <span id="user-followers' + users[i].id + '">' + users[i].cachedFollowersNumber + '</span>; <b  class="interest4">Registered:</b> ' + users[i].registeredDate.substring(0, 10) +
                    '            </p>' +

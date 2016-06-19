@@ -19,9 +19,195 @@
 <div class="content height-1660 content-inner">
     <div class="post">
         <div class="content-inner">
-            
+            <form id="edit-form" method="post" autocomplete="off" >
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td><br /><p>Avatar</p></td>
+
+                        <td>
+                            <br />
+                            <label for="file-input">
+                                {% if profile.image.name == "" %}
+                                    <img class="margin-left" src="/static/no_image.jpg" alt="User avatar" width="120" height="120" id="avatar" />
+                                {% else %}
+                                    <img class="margin-left" src="{{ profile.image.url }}" alt="User avatar" width="120" height="120" id="avatar" />
+                                {% endif %}
+                            </label>
+                            <input id="file-input" type="file" name="avatar" class="hidden" onchange="readURL(this);" accept="image/*" />
+                        </td>
+
+                        <td>
+                            <br /><p><b>Quick note:</b></p>
+                            <p class="margin-top">1. The image size should not exceed <b class="interest0">500 KB</b></p>
+                            <p>2. Do provide <b class="interest0">polite</b> image and personal info</p>
+                            <p>3. You are not able to <b class="interest0">change</b> a username</p>
+                            <p>4. You can leave info and social nets fields <b class="interest0">empty</b></p>
+                            <p>5. Your email will stay <b class="interest0">private</b></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><p>Email</p></td>
+                        <td><br /><input type="text" name="email" value="{{ profile.user.email }}" maxlength="30" required placeholder="example@example.com" /></td>
+                        <td><br /><p id="emailError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>First name</p></td>
+                        <td><input type="text" name="firstname" value="{{ profile.user.first_name }}" maxlength="20" required placeholder="A-Z, a-z" /></td>
+                        <td><p id="firstnameError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Last name</p></td>
+                        <td><input type="text" name="lastname" value="{{ profile.user.last_name }}" maxlength="20" required placeholder="A-Z, a-z" /></td>
+                        <td><p id="lastnameError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><h1>Personal info</h1></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Date of birth:</p></td>
+                        <td><input type="text" name="birth" value="{{ profile.dateOfBirth }}" maxlength="10" placeholder="2016-01-31" /></td>
+                        <td><p id="birthError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Gender:</p></td>
+                        <td><input type="text" name="gender" value="{{ profile.gender }}" maxlength="6" placeholder='"Male" or "Female"' /></td>
+                        <td><p id="genderError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Country:</p></td>
+                        <td><input type="text" name="country" value="{{ profile.country }}" maxlength="20" placeholder="A-Z, a-z" /></td>
+                        <td><p id="countryError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>City:</p></td>
+                        <td><input type="text" name="city" value="{{ profile.city }}" maxlength="20" placeholder="A-Z, a-z" /></td>
+                        <td><p id="cityError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><h1>Social networks</h1></td>
+                    </tr>
+                
+                    <tr>
+                        <td><p>Facebook:</p></td>
+                        <td><input type="text" name="facebook" value="{{ profile.facebook }}" maxlength="50" placeholder="https://www.facebook.com/..." /></td>
+                        <td><p id="facebookError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Twitter:</p></td>
+                        <td><input type="text" name="twitter" value="{{ profile.twitter }}" maxlength="50" placeholder="https://www.twitter.com/..." /></td>
+                        <td><p id="twitterError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Vk:</p></td>
+                        <td><input type="text" name="vk" value="{{ profile.vk }}" maxlength="50" placeholder="https://www.vk.com/..." /></td>
+                        <td><p id="vkError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><h1>Password change</h1></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>New Password</p></td>
+                        <td><input type="password" name="newpassword" maxlength="30" required placeholder="Empty to keep the old one" /></td>
+                        <td><p id="newpasswordError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Verify Password</p></td>
+                        <td><input type="password" name="newpassword_repeat" maxlength="30" required /></td>
+                        <td><p id="newpassword_repeatError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><h1>Confirmation</h1></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Password</p></td>
+                        <td><input type="password" name="password" maxlength="30" required /></td>
+                        <td><p id="passwordError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><input type="button" value="Confirm" class="usual bold" onClick="edit();" /></td>
+                        <td></td><td></td>
+                    </tr>
+                </table>
+            </form>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var registerForm = document.getElementById("edit-form");
+    var inputs = registerForm.getElementsByTagName("input");
+
+    for (var i = 0; i < inputs.length; i += 1) {
+        inputs[i].onkeypress = function (e) {
+            if (e.keyCode == 13) {
+                register();
+            }
+        }
+    }
+
+    function edit() {
+        $.ajax({
+            dataType: "json",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            url: '/profile/{{profile.id}}/edit/',
+            data: new FormData($('#edit-form')[0]),
+            success: function (response) {
+                if (response.result == 'ok') {
+                    window.location = '/profile/{{profile.id}}/';
+                } else {
+                    var errors = ["emailError", "firstnameError", "lastnameError", "newpasswordError", "newpassword_repeatError",
+                        "birthError", "genderError", "countryError", "cityError", "facebookError", "twitterError", "vkError", "passwordError"];
+
+                    for (var i = 0; i < errors.length; i += 1) {
+                        if (response.result != errors[i]) {
+                            $('#' + errors[i]).text("Ok");
+                        } else {
+                            $('#' + errors[i]).text(response.message);
+                            for (var j = i + 1; j < errors.length; j += 1) {
+                                $('#' + errors[j]).text("");
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#avatar').attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}

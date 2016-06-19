@@ -68,7 +68,7 @@ a, .nointerest, input[type="button"] {
 }
 
 .active>a, a:focus, a:hover, .active>input[type="button"], input[type="button"]:focus, input[type="button"]:hover {
-    color: #ffffff;
+    color: #ffffff!important;
 }
 
 .usual {

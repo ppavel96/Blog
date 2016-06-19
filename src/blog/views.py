@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+from PIL import Image
 import re, datetime
 
 from blog.models import *
@@ -112,6 +113,15 @@ def register(request):
             if User.objects.filter(username=username).count() > 0:
                 return JsonResponse({ 'result' : 'usernameError',  'message' : 'Username is already in use' }, safe=False)
 
+            if 'avatar' in request.FILES:
+                try:
+                    Image.open(request.FILES['avatar']).verify()
+                except:
+                    return JsonResponse({ 'result' : 'usernameError',  'message' : 'Avatar file does not look like an image' }, safe=False)
+
+                if request.FILES['avatar']._size > 1024 * 512:
+                    return JsonResponse({ 'result' : 'usernameError',  'message' : 'Avatar size exceeds limit (' + str(request.FILES['avatar']._size // 1024) + ' KB > 500 KB)' }, safe=False)
+
             if not re.match('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
                 return JsonResponse({ 'result' : 'emailError',     'message' : 'Email is invalid' }, safe=False)
 
@@ -133,7 +143,27 @@ def register(request):
             if password != password_repeat:
                 return JsonResponse({ 'result' : 'password_repeatError', 'message' : 'Passwords do not match' }, safe=False)
 
+            if len(birth) > 0:
+                if not re.match('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$', birth):
+                    return JsonResponse({ 'result' : 'birthError', 'message' : 'Date is in incorrect format' }, safe=False)
+
+                try:
+                    temp = datetime.date(year=int(birth[0:4]), month=int(birth[5:7]), day=int(birth[8:10]))
+                except:
+                    return JsonResponse({ 'result' : 'birthError', 'message' : 'Date is invalid' }, safe=False)
+                
+            if len(gender) > 0 and not gender in ("Male", "Female"):
+                return JsonResponse({ 'result' : 'genderError', 'message' : '"Male" or "Female" only!' }, safe=False)
+
+            if len(country) > 0 and not re.match('[A-Z|a-z| ]+$', country):
+                return JsonResponse({ 'result' : 'countryError',  'message' : 'Country contains invalid characters' }, safe=False)
+
+            if len(city) > 0 and not re.match('[A-Z|a-z| ]+$', city):
+                return JsonResponse({ 'result' : 'cityError',  'message' : 'City contains invalid characters' }, safe=False)
+
             profile = Profile(dateOfBirth=birth, gender=gender, country=country, city=city, facebook=facebook, twitter=twitter, vk=vk)
+            if 'avatar' in request.FILES:
+                profile.image = request.FILES['avatar']
 
             user = User.objects.create_user(username, email, password)
             user.first_name = firstname
@@ -189,13 +219,116 @@ def profile_subscriptions(request, profile = '0'):
     return page_404(request)
 
 def profile_edit(request, profile = '0'):
-    if Profile.objects.filter(id=profile).count() > 0:
-        if request.user.is_authenticated() and request.user.profile.id == int(profile):
-            return render(request, 'blog/profile_edit.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
-        else:
-            return redirect('/profile/' + profile + '/')
+    if request.method == 'GET':
+        if Profile.objects.filter(id=profile).count() > 0:
+            if request.user.is_authenticated() and request.user.profile.id == int(profile):
+                return render(request, 'blog/profile_edit.html', { 'navigation' : 'profile', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'profile' : Profile.objects.get(id=profile) })
+            else:
+                return redirect('/profile/' + profile + '/')
 
-    return page_404(request)
+        return page_404(request)
+    else:
+        try:
+            if request.user.is_authenticated() and request.user.profile.id == int(profile):
+                email = request.POST.get('email').strip()
+
+                firstname = request.POST.get('firstname').strip()
+                lastname = request.POST.get('lastname').strip()
+
+                birth = request.POST.get('birth').strip()
+                gender = request.POST.get('gender').strip()
+                country = request.POST.get('country').strip()
+                city = request.POST.get('city').strip()
+
+                facebook = request.POST.get('facebook').strip()
+                twitter = request.POST.get('twitter').strip()
+                vk = request.POST.get('vk').strip()
+
+                newpassword = request.POST.get('newpassword')
+                newpassword_repeat = request.POST.get('newpassword_repeat')
+
+                password = request.POST.get('password')
+
+                if 'avatar' in request.FILES:
+                    try:
+                        Image.open(request.FILES['avatar']).verify()
+                    except:
+                        return JsonResponse({ 'result' : 'emailError',  'message' : 'Avatar file does not look like an image' }, safe=False)
+
+                    if request.FILES['avatar']._size > 1024 * 512:
+                        return JsonResponse({ 'result' : 'emailError',  'message' : 'Avatar size exceeds limit (' + str(request.FILES['avatar']._size // 1024) + ' KB > 500 KB)' }, safe=False)
+
+                if not re.match('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+                    return JsonResponse({ 'result' : 'emailError',     'message' : 'Email is invalid' }, safe=False)
+
+                if len(firstname) < 2 or len(firstname) > 20:
+                    return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname\'s length should be between 2 and 20' }, safe=False)
+
+                if not re.match('[A-Z|a-z| ]+$', firstname):
+                    return JsonResponse({ 'result' : 'firstnameError', 'message' : 'Firstname contains invalid characters' }, safe=False)
+
+                if len(lastname) < 2 or len(lastname) > 20:
+                    return JsonResponse({ 'result' : 'lastnameError',  'message' : 'Lastname\'s length should be between 2 and 20' }, safe=False)
+
+                if not re.match('[A-Z|a-z| ]+$', lastname):
+                    return JsonResponse({ 'result' : 'lastnameError', 'message' : 'Lastname contains invalid characters' }, safe=False)
+
+                if len(birth) > 0:
+                    if not re.match('[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$', birth):
+                        return JsonResponse({ 'result' : 'birthError', 'message' : 'Date is in incorrect format' }, safe=False)
+
+                    try:
+                        temp = datetime.date(year=int(birth[0:4]), month=int(birth[5:7]), day=int(birth[8:10]))
+                    except:
+                        return JsonResponse({ 'result' : 'birthError', 'message' : 'Date is invalid' }, safe=False)
+                
+                if len(gender) > 0 and not gender in ("Male", "Female"):
+                    return JsonResponse({ 'result' : 'genderError', 'message' : '"Male" or "Female" only!' }, safe=False)
+
+                if len(country) > 0 and not re.match('[A-Z|a-z| ]+$', country):
+                    return JsonResponse({ 'result' : 'countryError',  'message' : 'Country contains invalid characters' }, safe=False)
+
+                if len(city) > 0 and not re.match('[A-Z|a-z| ]+$', city):
+                    return JsonResponse({ 'result' : 'cityError',  'message' : 'City contains invalid characters' }, safe=False)
+
+                if len(newpassword) > 0:
+                    if len(newpassword) < 6:
+                        return JsonResponse({ 'result' : 'newpasswordError',  'message' : 'Password should be at least 6 characters long' }, safe=False)
+
+                    if newpassword != newpassword_repeat:
+                        return JsonResponse({ 'result' : 'newpassword_repeatError', 'message' : 'Passwords do not match' }, safe=False)
+
+                if not request.user.check_password(password):
+                    return JsonResponse({ 'result' : 'passwordError', 'message' : 'Incorrect password' }, safe=False)
+
+                request.user.email = email
+                request.user.first_name = firstname
+                request.user.last_name = lastname
+
+                if len(newpassword) > 0:
+                    request.user.set_password(newpassword)
+                    logout(request)
+
+                request.user.save()
+
+                request.user.profile.dateOfBirth = birth
+                request.user.profile.gender=gender
+                request.user.profile.country=country
+                request.user.profile.city=city
+                request.user.profile.facebook=facebook
+                request.user.profile.twitter=twitter
+                request.user.profile.vk = vk
+
+                if 'avatar' in request.FILES:
+                    request.user.profile.image = request.FILES['avatar']
+
+                request.user.profile.save()
+
+                return JsonResponse({ 'result' : 'ok' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+        except:
+            return JsonResponse(['Error'], safe=False)
 
 
 # API (Helper functions)

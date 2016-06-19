@@ -2,6 +2,7 @@
 from django.utils import timezone
 from django.db.models import Sum
 from django.db.models.functions import Coalesce, Value
+from blog.storage import OverwriteStorage
 
 
 class Post(models.Model):
@@ -236,9 +237,13 @@ class Blog(models.Model):
         return self.title
 
 
+def user_avatar_path(instance, filename):
+    return 'avatars/{0}'.format(instance.user.id)
+
+
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
-    image = models.CharField(max_length=200, blank=True)
+    image = models.ImageField(upload_to=user_avatar_path, storage=OverwriteStorage(), blank=True)
 
     dateOfBirth = models.CharField(max_length=10, default="", blank=True)
     gender = models.CharField(max_length=6, default="", blank=True)
@@ -302,7 +307,7 @@ class Profile(models.Model):
 
                  'is_subscribed' : self.is_followed_by(user),
 
-                 'image' : self.image,
+                 'image' : self.image.url if self.image else "",
 
                  'dateOfBirth' : self.dateOfBirth,
                  'gender' : self.gender,

@@ -153,6 +153,7 @@
 
         function login() {
             $.ajax({
+                dataType: "json",
                 type: "POST",
                 url: '/login/',
                 data: $('#login-form').serialize(),
@@ -171,6 +172,7 @@
 
         function logout() {
             $.ajax({
+                dataType: "json",
                 type: "POST",
                 url: '/logout/',
                 data: { csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value },
