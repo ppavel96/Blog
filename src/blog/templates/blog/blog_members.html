@@ -1,0 +1,30 @@
+﻿{% extends "blog/base.html" %}
+{% load static from staticfiles %}
+
+{% block title %}Members of {{blog.title}}{% endblock %}
+
+{% block content %}
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item"><a href="/blogs/{{blog.id}}/">Overview</a></li>
+        <li class="content-header-item active"><a href="/blogs/{{blog.id}}/members/">Members</a></li>
+        {% if user.is_authenticated %}
+            <li class="content-header-item"><a href="/blogs/{{blog.id}}/publish/">Publish a post there!</a></li>
+        {% else %}
+            <li class="content-header-item disabled">Publish a post there!</li>
+        {% endif %}
+        {% if blog.creator.id == request.user.id %}
+            <li class="content-header-item right-align-text"><a class="interest1" href="/blogs/{{blog.id}}/edit/"><b>Edit</b></a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="content height-1660 content-inner" id="user_pool"></div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{%  static 'js/loadData.js' %}"></script>
+<script>
+    window.onscroll = window.onload = function () { loadMembers({{ blog.id }}); }
+</script>
+{% endblock %}

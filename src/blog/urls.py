@@ -20,8 +20,11 @@ urlpatterns = [
 
     url(r'^blogs/$', RedirectView.as_view(url='/blogs/best/', permanent=True)),
     url(r'^blogs/(best|new|feed)/$', views.blogs, name='blogs'),
+    url(r'^blogs/create/$', views.blog_create, name='blog create'),
 
-    url(r'^blogs/([0-9]+)/$', views.blog_search, name='blog search'),
+    url(r'^blogs/([0-9]+)/$', views.blog_profile, name='blog profile'),
+    url(r'^blogs/([0-9]+)/publications/$', views.blog_publications, name='blog publications'),
+    url(r'^blogs/([0-9]+)/members/$', views.blog_members, name='blog members'),
 
     url(r'^people/$', views.people, name='people'),
     url(r'^about/$', views.about, name='about'),

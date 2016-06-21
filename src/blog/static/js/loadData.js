@@ -33,7 +33,7 @@ function loadGeneric(url, request, callback) {
             success: function (data) {
                 loadGeneric.nextID[url] += data.length;
                 if (data.length < request.count) {
-                    loadGeneric.noMore = true;
+                    loadGeneric.noMore[url] = true;
                 }
 
                 var newdata = [];
@@ -74,6 +74,10 @@ function loadSubscriptions(user_id) {
 
 function loadSubscriptionsForPosts(user_id) {
     loadGeneric('/api/users.getSubscriptionsForPosts', { count: 20, user_id: user_id }, constructPosts);
+}
+
+function loadMembers(blog_id) {
+    loadGeneric('/api/blogs.getFollowers', { count: 20, blog_id: blog_id }, constructUsers);
 }
 
 function constructPosts(posts, comment_link) {
@@ -137,6 +141,10 @@ function constructBlogs(blogs) {
             time: new Date(blogs[i].publishedDate)
         });
 
+        if (blogs[i].image == "") {
+            blogs[i].image = '/static/no_image.jpg';
+        }
+
         var fav_data = blogs[i].is_subscribed;
         var fav_icon = fav_data == 1 ? '/static/favorite_pressed.png' : '/static/favorite.png';
 
@@ -155,7 +163,7 @@ function constructBlogs(blogs) {
                    '            <br />' +
 
                    '            <p>' + blogs[i].description + '</p>' + '<br />' +
-                   '            <a target="_blank" href="/blogs/' + blogs[i].id + '/">Go to posts... </a>' +
+                   '            <a target="_blank" href="/blogs/' + blogs[i].id + '/publications/">Go to posts... </a>' +
                    '        </div>' +
                    '    </div>' +
                    '</div>' +

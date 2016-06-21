@@ -175,11 +175,15 @@ class VoteForComment(models.Model):
         pass
 
 
+def blog_avatar_path(instance, filename):
+    return 'blog_avatars/{0}'.format(instance.id)
+
+
 class Blog(models.Model):
     creator = models.ForeignKey('auth.User')
 
-    title = models.CharField(max_length=200)
-    image = models.CharField(max_length=200, blank=True)
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to=blog_avatar_path, storage=OverwriteStorage(), blank=True)
 
     description = models.TextField()
 
@@ -217,7 +221,7 @@ class Blog(models.Model):
                  'is_subscribed' : self.is_followed_by(user),
 
                  'title' : self.title,
-                 'image' : self.image,
+                 'image' : self.image.url if self.image else "",
 
                  'description' : self.description,
 

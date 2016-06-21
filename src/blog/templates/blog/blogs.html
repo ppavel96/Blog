@@ -11,8 +11,10 @@
         <li class="content-header-item {% if category == 'best' %}active{% endif %}"><a href="/blogs/best/">Best</a></li>
         {% if user.is_authenticated %}
         <li class="content-header-item {% if category == 'feed' %}active{% endif %}"><a href="/blogs/feed/">Feed</a></li>
+        <li class="content-header-item"><a href="/blogs/create/">Create</a></li>
         {% else %}
         <li class="content-header-item disabled">Feed</li>
+        <li class="content-header-item disabled">Create</li>
         {% endif %}
     </ul>
 </nav>

@@ -43,11 +43,65 @@ def publications(request, user = '0'):
     if Profile.objects.filter(id=user).count() > 0:
         return render(request, 'blog/publications.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'user_' + user, 'user_name' : Profile.objects.get(id=user).user.username })
 
-def blog_search(request, blog = '0'):
+def blog_profile(request, blog = '0'):
     if Blog.objects.filter(id=blog).count() > 0:
-        return render(request, 'blog/blog_search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'blog_' + blog, 'blog_name' : Blog.objects.get(id=blog).title })
+        return render(request, 'blog/blog_profile.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'blog' : Blog.objects.get(id=blog), 'blog_json' : Blog.objects.get(id=blog).to_JSON(request.user) })
 
     return page_404(request)
+
+def blog_members(request, blog = '0'):
+    if Blog.objects.filter(id=blog).count() > 0:
+        return render(request, 'blog/blog_members.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'blog' : Blog.objects.get(id=blog) })
+
+    return page_404(request)
+
+def blog_publications(request, blog = '0'):
+    if Blog.objects.filter(id=blog).count() > 0:
+        return render(request, 'blog/blog_publications.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'blog_' + blog, 'blog_name' : Blog.objects.get(id=blog).title })
+
+    return page_404(request)
+
+def blog_create(request):
+    if request.method == 'GET':
+        if not request.user.is_authenticated():
+            return redirect('/blogs/new/')
+
+        return render(request, 'blog/blog_create.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
+    else:
+        try:
+            if request.user.is_authenticated():
+                title = request.POST.get('title').strip()
+                description = request.POST.get('description').strip()
+
+                if len(title) < 2 or len(title) > 100:
+                    return JsonResponse({ 'result' : 'titleError',  'message' : 'Title\'s length should be between 2 and 100' }, safe=False)
+
+                if len(description) == 0:
+                    return JsonResponse({ 'result' : 'descriptionError',  'message' : 'Please, write something at least' }, safe=False)
+            
+                if 'avatar' in request.FILES:
+                    try:
+                        Image.open(request.FILES['avatar']).verify()
+                    except:
+                        return JsonResponse({ 'result' : 'titleError',  'message' : 'Avatar file does not look like an image' }, safe=False)
+
+                    if request.FILES['avatar']._size > 1024 * 512:
+                        return JsonResponse({ 'result' : 'titleError',  'message' : 'Avatar size exceeds limit (' + str(request.FILES['avatar']._size // 1024) + ' KB > 500 KB)' }, safe=False)
+
+                blog = Blog(title=title,description=description,creator=request.user,publishedDate=datetime.datetime.utcnow())
+                
+                if 'avatar' in request.FILES:
+                    blog.image = request.FILES['avatar']
+
+                blog.save()
+
+                return JsonResponse({ 'result' : 'ok', 'message' : '/blogs/' + str(blog.id) + '/' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
 
 def login_view(request):
     if request.method == 'POST':

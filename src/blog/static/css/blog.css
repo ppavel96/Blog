@@ -234,8 +234,8 @@ blockquote {
 /* ----------------------- LOGIN FORM ------------------------- */
 
 .modal, .modal-login-content {
-    display: none;
     z-index: 1;
+    visibility: hidden;
 }
 
 .modal {
@@ -247,9 +247,6 @@ blockquote {
     
     background-color: #000;
     background-color: rgba(0,0,0,0.6);
-    
-    animation-name: fadeout;
-    animation-duration: 0.3s;
 }
 
 .modal-login-content {
@@ -263,9 +260,6 @@ blockquote {
     margin: -10px 0 0 625px;
     padding: 10px;
     width: 342px;
-    
-    animation-name: fadeout;
-    animation-duration: 0.5s;
 }
 
 .login-confirm {
@@ -280,7 +274,7 @@ blockquote {
 /* ------------------------------------------------------------ */
 /* ----------------------- INPUT FIELDS ----------------------- */
 
-input[type="text"], input[type="password"], select {
+input[type="text"], input[type="password"], textarea {
     margin-left: 20px;
     margin-right: 20px;
     
@@ -291,13 +285,26 @@ input[type="text"], input[type="password"], select {
     padding-right: 10px;
     
     border: solid 0;
-    border-radius: 8px;
+    border-bottom: 1px solid #777;
     
-    transition: box-shadow 0.3s;
+    background-color: #000;
+    background-color: rgba(0,0,0,0);
+    
+    color: #fff;
+    font-style: italic;
+    
+    outline: none;
+    
+    transition-delay: 9999999999999999999999999s;
+    transition-property: background-color, color;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
-    outline: none;
+textarea {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    
+    border: 1px solid #777;
+    position: fixed;
 }
 
 input[type="button"] {
@@ -314,12 +321,13 @@ input[type="image"] {
     outline: none;
 }
 
-input:-webkit-autofill {
-    box-shadow: 0 0 0 1000px #fff inset;
-}
-
 /* ------------------------------------------------------------ */
 /* ----------------------- ANIMATIONS ------------------------- */
+
+.fadeout {
+    animation-name: fadeout;
+    animation-duration: 0.3s;
+}
 
 @keyframes fadeout {
     from {opacity: 0}

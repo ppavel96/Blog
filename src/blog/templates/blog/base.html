@@ -128,12 +128,16 @@
         var modalLoginButton = document.getElementById("modal-login-button");
 
         modalLoginButton.onclick = function () {
-            modal.style.display = modalLoginContent.style.display = "block";
+            modal.style.visibility = modalLoginContent.style.visibility = "visible";
+            modalLoginContent.classList.add("fadeout");
+            modal.classList.add("fadeout");
         };
 
         window.onclick = function (event) {
             if (event.target == modal) {
-                modal.style.display = modalLoginContent.style.display = "none";
+                modal.style.visibility = modalLoginContent.style.visibility = "hidden";
+                modalLoginContent.classList.remove("fadeout");
+                modal.classList.remove("fadeout");
                 $('#login-incorrect').hide();
             }
         };
