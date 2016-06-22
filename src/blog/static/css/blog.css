@@ -231,6 +231,21 @@ blockquote {
 }
 
 /* ------------------------------------------------------------ */
+/* ----------------------- SCROLL BARS ------------------------ */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+ 
+::-webkit-scrollbar-track {
+    background: #000;
+}
+ 
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 7px #fff;
+}
+
+/* ------------------------------------------------------------ */
 /* ----------------------- LOGIN FORM ------------------------- */
 
 .modal, .modal-login-content {
@@ -304,7 +319,9 @@ textarea {
     padding-bottom: 10px;
     
     border: 1px solid #777;
-    position: fixed;
+    position: absolute;
+    
+    resize: none;
 }
 
 input[type="button"] {

@@ -1,27 +1,22 @@
 ﻿{% extends "blog/base.html" %}
 
-{% block title %}Blog creation{% endblock %}
+{% block title %}{{ blog.title }}{% endblock %}
 
 {% block content %}
 
 <nav class="content content-header" role="navigation">
     <ul>
-        <li class="content-header-item"><a href="/blogs/new/">New</a></li>
-        <li class="content-header-item"><a href="/blogs/best/">Best</a></li>
-        {% if user.is_authenticated %}
-        <li class="content-header-item"><a href="/blogs/feed/">Feed</a></li>
-        <li class="content-header-item active"><a href="/blogs/create/">Create</a></li>
-        {% else %}
-        <li class="content-header-item disabled">Feed</li>
-        <li class="content-header-item disabled">Create</li>
-        {% endif %}
+        <li class="content-header-item"><a href="/blogs/{{blog.id}}/">Overview</a></li>
+        <li class="content-header-item"><a href="/blogs/{{blog.id}}/members/">Members</a></li>
+        <li class="content-header-item"><a href="/blogs/{{blog.id}}/publish/">Publish a post there!</a></li>
+        <li class="content-header-item right-align-text active"><a class="interest1" href="/blogs/{{blog.id}}/edit/"><b>Edit</b></a></li>
     </ul>
 </nav>
 
 <div class="content height-1660 content-inner">
     <div class="post">
         <div class="content-inner">
-            <form id="register-form" method="post" autocomplete="off" >
+            <form id="edit-form" method="post" autocomplete="off" >
                 {% csrf_token %}
                 <input type="password" hidden />
                 <table>
@@ -30,7 +25,13 @@
 
                         <td>
                             <br />
-                            <label for="file-input"><img src="/static/no_image.jpg" alt="avatar" width="120" height="120" class="margin-left" id="avatar" /></label>
+                            <label for="file-input">
+                                {% if blog.image.name == "" %}
+                                    <img class="margin-left" src="/static/no_image.jpg" alt="User avatar" width="120" height="120" id="avatar" />
+                                {% else %}
+                                    <img class="margin-left" src="{{ blog.image.url }}" alt="User avatar" width="120" height="120" id="avatar" />
+                                {% endif %}
+                            </label>
                             <input id="file-input" type="file" name="avatar" class="hidden" onchange="readURL(this);" accept="image/*" />
                         </td>
 
@@ -46,17 +47,17 @@
 
                     <tr>
                         <td><br /><p>Title</p></td>
-                        <td><br /><input type="text" name="title" maxlength="100" /></td>
+                        <td><br /><input type="text" name="title" maxlength="100" value="{{blog.title}}" /></td>
                         <td><br /><p id="titleError" class="interest0"></p></td>
                     </tr>
 
                     <tr>
                         <td><p class="margin-top">Description</p></td>
-                        <td><textarea class="margin-top" name="description" placeholder="Please, provide a vivid description. Allowed tags set: <p>, <a>, <i>, <b>, <s>, <br/>, <img/>, <li>, <ul>, <ol>. Every piece of text should inside <p> or <a> while <img/> and <br/> tags should have a closing slash." rows="20" cols="70"></textarea></td>
+                        <td><textarea class="margin-top" name="description" placeholder="Please, provide a vivid description. Allowed tags set: <p>, <a>, <i>, <b>, <s>, <br/>, <img/>, <li>, <ul>, <ol>. Every piece of text should inside <p> or <a> while <img/> and <br/> tags should have a closing slash." rows="20" cols="70">{{ blog.description }}</textarea></td>
                     </tr>
 
                     <tr>
-                        <td><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><input type="button" value="Create" class="usual bold" onClick="register();" /></td>
+                        <td><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><input type="button" value="Confirm" class="usual bold" onClick="edit();" /></td>
                         <td></td>
                         <td><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><p id="descriptionError" class="interest0"></td>
                     </tr>
@@ -70,7 +71,7 @@
 
 {% block scripts %}
 <script>
-    var registerForm = document.getElementById("register-form");
+    var editForm = document.getElementById("edit-form");
     var inputs = registerForm.getElementsByTagName("input");
 
     for (var i = 0; i < inputs.length; i += 1) {
@@ -81,14 +82,14 @@
         }
     }
 
-    function register() {
+    function edit() {
         $.ajax({
             dataType: "json",
             type: "POST",
             contentType: false,
             processData: false,
-            url: '/blogs/create/',
-            data: new FormData($('#register-form')[0]),
+            url: '/blogs/{{blog.id}}/edit/',
+            data: new FormData($('#edit-form')[0]),
             success: function (response) {
                 if (response.result == 'ok') {
                     window.location.href = response.message;

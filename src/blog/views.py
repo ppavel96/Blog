@@ -1,10 +1,16 @@
-﻿from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+﻿from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+
 from django.db.models import Q
+from django.utils import timezone
+
+from django.db import transaction
 
 from PIL import Image
+from html.parser import HTMLParser
 import re, datetime
 
 from blog.models import *
@@ -30,11 +36,80 @@ def blogs(request, category = 'best'):
 def about(request):
     return render(request, 'blog/about.html', { 'navigation' : 'about', 'tags' : Tag.objects.all().order_by('cachedTagNumber') })
 
-def comments(request, id = '0'):
+def post_content(request, id = '0'):
     if Post.objects.filter(id=id).count() > 0:
-        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id), 'post_json' : Post.objects.get(id=id).to_JSON(request.user) })
+        return render(request, 'blog/post_content.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id), 'post_json' : Post.objects.get(id=id).to_JSON(request.user) })
     
     return page_404(request)
+
+def comments(request, id = '0'):
+    if Post.objects.filter(id=id).count() > 0:
+        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id) })
+    
+    return page_404(request)
+
+def post_edit(request, id = '0'):
+    if request.method == 'GET':
+        if not request.user.is_authenticated() or Post.objects.all().filter(id=id).count() == 0 or request.user.id != int(Post.objects.all().get(id=id).author.id):
+            return redirect('/posts/new/')
+
+        return render(request, 'blog/post_edit.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.all().get(id=id) })
+    else:
+        try:
+            post = Post.objects.all().get(id=id)
+            if request.user.is_authenticated() and request.user.id == int(post.author.id):
+                title = request.POST.get('title').strip()
+                tags = list([x.strip() for x in request.POST.get('tags').split(';') if len(x.strip()) > 0])
+                content = request.POST.get('content').strip()
+
+                if len(title) < 2 or len(title) > 100:
+                    return JsonResponse({ 'result' : 'titleError',  'message' : 'Title\'s length should be between 2 and 100' }, safe=False)
+
+                if len(tags) == 0:
+                    return JsonResponse({ 'result' : 'tagsError',  'message' : 'Provide at least one tag' }, safe=False)
+
+                for tag in tags:
+                    if len(tag) > 10:
+                        return JsonResponse({ 'result' : 'tagsError',  'message' : 'Each tag\'s length should be no more than 10' }, safe=False)
+
+                    if not re.match('[A-Z|0-9|a-z|_]+$', tag):
+                        return JsonResponse({ 'result' : 'tagsError',  'message' : 'Some tag contains incorrect symbols' }, safe=False)
+
+                if len(content) == 0:
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Please, write something at least' }, safe=False)
+
+                if not validate(content):
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Syntax error in content' }, safe=False)
+
+                with transaction.atomic():
+                    post.title=title
+                    post.content=content
+                    post.save()
+
+                    for tag in post.tags.all():
+                        tag.cachedTagNumber -= 1
+                        tag.save()
+
+                    post.tags.clear()
+
+                    for tag in tags:
+                        if Tag.objects.all().filter(name=tag).count() == 0:
+                            tag_object = Tag(name=tag, cachedTagNumber=1)
+                        else:
+                            tag_object = Tag.objects.all().get(name=tag)
+                            tag_object.cachedTagNumber += 1
+
+                        tag_object.save()
+                        post.tags.add(tag_object)
+
+                    post.save()
+
+                return JsonResponse({ 'result' : 'ok', 'message' : '/posts/' + str(post.id) + '/' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
 
 def search(request, tag = ''):
     return render(request, 'blog/search.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'category' : 'tag_' + tag })
@@ -78,6 +153,9 @@ def blog_create(request):
 
                 if len(description) == 0:
                     return JsonResponse({ 'result' : 'descriptionError',  'message' : 'Please, write something at least' }, safe=False)
+
+                if not validate(description):
+                    return JsonResponse({ 'result' : 'descriptionError',  'message' : 'Syntax error in description' }, safe=False)
             
                 if 'avatar' in request.FILES:
                     try:
@@ -88,7 +166,7 @@ def blog_create(request):
                     if request.FILES['avatar']._size > 1024 * 512:
                         return JsonResponse({ 'result' : 'titleError',  'message' : 'Avatar size exceeds limit (' + str(request.FILES['avatar']._size // 1024) + ' KB > 500 KB)' }, safe=False)
 
-                blog = Blog(title=title,description=description,creator=request.user,publishedDate=datetime.datetime.utcnow())
+                blog = Blog(title=title,description=description,creator=request.user,publishedDate=timezone.now())
                 
                 if 'avatar' in request.FILES:
                     blog.image = request.FILES['avatar']
@@ -102,6 +180,110 @@ def blog_create(request):
         except:
             return JsonResponse(['Error'], safe=False)
 
+def blog_edit(request, id = '0'):
+    if request.method == 'GET':
+        if not request.user.is_authenticated() or Blog.objects.all().filter(id=id).count() == 0 or request.user.id != int(Blog.objects.all().get(id=id).creator.id):
+            return redirect('/blogs/new/')
+
+        return render(request, 'blog/blog_edit.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'blog' : Blog.objects.all().get(id=id) })
+    else:
+        try:
+            blog = Blog.objects.all().get(id=id)
+            if request.user.is_authenticated() and request.user.id == int(blog.creator.id):
+                title = request.POST.get('title').strip()
+                description = request.POST.get('description').strip()
+
+                if len(title) < 2 or len(title) > 100:
+                    return JsonResponse({ 'result' : 'titleError',  'message' : 'Title\'s length should be between 2 and 100' }, safe=False)
+
+                if len(description) == 0:
+                    return JsonResponse({ 'result' : 'descriptionError',  'message' : 'Please, write something at least' }, safe=False)
+
+                if not validate(description):
+                    return JsonResponse({ 'result' : 'descriptionError',  'message' : 'Syntax error in description' }, safe=False)
+            
+                if 'avatar' in request.FILES:
+                    try:
+                        Image.open(request.FILES['avatar']).verify()
+                    except:
+                        return JsonResponse({ 'result' : 'titleError',  'message' : 'Avatar file does not look like an image' }, safe=False)
+
+                    if request.FILES['avatar']._size > 1024 * 512:
+                        return JsonResponse({ 'result' : 'titleError',  'message' : 'Avatar size exceeds limit (' + str(request.FILES['avatar']._size // 1024) + ' KB > 500 KB)' }, safe=False)
+
+                blog.title = title
+                blog.description=description
+                
+                if 'avatar' in request.FILES:
+                    blog.image = request.FILES['avatar']
+
+                blog.save()
+
+                return JsonResponse({ 'result' : 'ok', 'message' : '/blogs/' + str(blog.id) + '/' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+def blog_publish(request, id ='0'):
+    if request.method == 'GET':
+        if not request.user.is_authenticated() or Blog.objects.all().filter(id=id).count() == 0:
+            return redirect('/blogs/new/')
+
+        return render(request, 'blog/blog_publish.html', { 'navigation' : 'blogs', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'blog' : Blog.objects.all().get(id=id) })
+    else:
+        try:
+            if request.user.is_authenticated():
+                title = request.POST.get('title').strip()
+                tags = list([x.strip() for x in request.POST.get('tags').split(';') if len(x.strip()) > 0])
+                content = request.POST.get('content').strip()
+
+                if len(title) < 2 or len(title) > 100:
+                    return JsonResponse({ 'result' : 'titleError',  'message' : 'Title\'s length should be between 2 and 100' }, safe=False)
+
+                if len(tags) == 0:
+                    return JsonResponse({ 'result' : 'tagsError',  'message' : 'Provide at least one tag' }, safe=False)
+
+                for tag in tags:
+                    if len(tag) > 10:
+                        return JsonResponse({ 'result' : 'tagsError',  'message' : 'Each tag\'s length should be no more than 10' }, safe=False)
+
+                    if not re.match('[A-Z|0-9|a-z|_]+$', tag):
+                        return JsonResponse({ 'result' : 'tagsError',  'message' : 'Some tag contains incorrect symbols' }, safe=False)
+
+                if len(content) == 0:
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Please, write something at least' }, safe=False)
+
+                if not validate(content):
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Syntax error in content' }, safe=False)
+
+                with transaction.atomic():
+                    blog = Blog.objects.all().get(id=id)
+                    blog.cachedPostsNumber += 1
+                    blog.save()
+
+                    post = Post(title=title, content=content, author=request.user, blog=blog, publishedDate=timezone.now())
+                    post.save()
+
+                    for tag in tags:
+                        if Tag.objects.all().filter(name=tag).count() == 0:
+                            tag_object = Tag(name=tag, cachedTagNumber=1)
+                        else:
+                            tag_object = Tag.objects.all().get(name=tag)
+                            tag_object.cachedTagNumber += 1
+
+                        tag_object.save()
+                        post.tags.add(tag_object)
+
+                    post.save()
+
+                return JsonResponse({ 'result' : 'ok', 'message' : '/posts/' + str(post.id) + '/' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+
+        except:
+            return JsonResponse(['Error'], safe=False)
 
 def login_view(request):
     if request.method == 'POST':
@@ -215,18 +397,19 @@ def register(request):
             if len(city) > 0 and not re.match('[A-Z|a-z| ]+$', city):
                 return JsonResponse({ 'result' : 'cityError',  'message' : 'City contains invalid characters' }, safe=False)
 
-            profile = Profile(dateOfBirth=birth, gender=gender, country=country, city=city, facebook=facebook, twitter=twitter, vk=vk)
-            if 'avatar' in request.FILES:
-                profile.image = request.FILES['avatar']
+            with transaction.atomic():
+                profile = Profile(dateOfBirth=birth, gender=gender, country=country, city=city, facebook=facebook, twitter=twitter, vk=vk)
+                if 'avatar' in request.FILES:
+                    profile.image = request.FILES['avatar']
 
-            user = User.objects.create_user(username, email, password)
-            user.first_name = firstname
-            user.last_name = lastname
+                user = User.objects.create_user(username, email, password)
+                user.first_name = firstname
+                user.last_name = lastname
 
-            user.save()
+                user.save()
 
-            profile.user = user;
-            profile.save()
+                profile.user = user;
+                profile.save()
 
             user = authenticate(username=username, password=password)
             login(request, user)
@@ -384,6 +567,64 @@ def profile_edit(request, profile = '0'):
         except:
             return JsonResponse(['Error'], safe=False)
 
+# HTML validation
+
+class HTMLValidator(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.state = 1
+        self.stack = []
+
+    def handle_starttag(self, tag, attrs):
+        if not tag in ('p', 'i', 'b', 's', 'br', 'img', 'li', 'ul', 'ol', 'a'):
+            self.state = 0
+        else:
+            if not tag in ('img', 'a') and len(attrs) > 0:
+                self.state = 0
+            elif tag == 'img':
+                for attr in attrs:
+                    if not attr[0] in ('src', 'width', 'height', 'alt'):
+                        self.state = 0
+            elif tag == 'a':
+                for attr in attrs:
+                    if not attr[0] in ('href', 'target'):
+                        self.state = 0
+
+            self.stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if len(self.stack) == 0 or self.stack[-1] != tag:
+            self.state = 0
+        else:
+            self.stack.pop()
+
+    def handle_comment(self, data):
+        self.state = 0
+
+    def handle_decl(self, data):
+        self.state = 0
+
+    def is_ok(self):
+        return self.state == 1 and len(self.stack) == 0
+
+
+def validate(html):
+    meetings = 0
+    for c in html:
+        if c == '<':
+            meetings += 1
+        elif c == '>':
+            meetings -= 1
+            if meetings < 0:
+                return False
+
+    if meetings != 0:
+        return False
+
+    validator = HTMLValidator()
+    validator.feed(html)
+
+    return validator.is_ok()
 
 # API (Helper functions)
 

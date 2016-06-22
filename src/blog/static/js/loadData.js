@@ -81,8 +81,6 @@ function loadMembers(blog_id) {
 }
 
 function constructPosts(posts, comment_link) {
-    comment_link = typeof comment_link != 'undefined' ? comment_link : true;
-
     for (var i = 0; i < posts.length; i += 1) {
         var timerID = "postPublishTime_" + posts[i].id;
 
@@ -115,16 +113,11 @@ function constructPosts(posts, comment_link) {
 
         text += posts[i].content;
 
-        if (comment_link)
-            text += '    <br>' +
-                    '    <a target="_blank" href="/posts/' + posts[i].id + '/">Go to comments... </a>';
-
-        text +=     '    </div>' +
+        text +=     '    <br>' +
+                    '    <a target="_blank" href="/posts/' + posts[i].id + '/comments/">Go to comments... </a>' +
+                    '    </div>' +
                     '</div>' +
                     '<hr><br>';
-
-        if (!comment_link)
-            text += '<div><div class="content-inner" id="comment_pool"><h1>Comments</h1></div></div>';
 
         $("#post_pool").append(text);
     }
@@ -162,7 +155,7 @@ function constructBlogs(blogs) {
                    '            </p>' +
                    '            <br />' +
 
-                   '            <p>' + blogs[i].description + '</p>' + '<br />' +
+                                blogs[i].description + '<br />' +
                    '            <a target="_blank" href="/blogs/' + blogs[i].id + '/publications/">Go to posts... </a>' +
                    '        </div>' +
                    '    </div>' +

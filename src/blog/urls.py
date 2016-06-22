@@ -13,7 +13,9 @@ urlpatterns = [
     url(r'^posts/$', RedirectView.as_view(url='/posts/new/', permanent=True)),
     url(r'^posts/(new|best|feed)/$', views.posts, name='posts'),
 
-    url(r'^posts/([0-9]+)/$', views.comments, name='comments'),
+    url(r'^posts/([0-9]+)/$', views.post_content, name='post content'),
+    url(r'^posts/([0-9]+)/comments/$', views.comments, name='comments'),
+    url(r'^posts/([0-9]+)/edit/$', views.post_edit, name='post edit'),
 
     url(r'^tags/(.+)/$', views.search, name='search'),
     url(r'^publications/([0-9]+)/$', views.publications, name='publications'),
@@ -25,6 +27,8 @@ urlpatterns = [
     url(r'^blogs/([0-9]+)/$', views.blog_profile, name='blog profile'),
     url(r'^blogs/([0-9]+)/publications/$', views.blog_publications, name='blog publications'),
     url(r'^blogs/([0-9]+)/members/$', views.blog_members, name='blog members'),
+    url(r'^blogs/([0-9]+)/edit/$', views.blog_edit, name='blog edit'),
+    url(r'^blogs/([0-9]+)/publish/$', views.blog_publish, name='blog publish'),
 
     url(r'^people/$', views.people, name='people'),
     url(r'^about/$', views.about, name='about'),

@@ -1,0 +1,98 @@
+﻿{% extends "blog/base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+
+<nav class="content content-header" role="navigation">
+    <ul>
+        <li class="content-header-item"><a href="/posts/{{post.id}}/">Content</a></li>
+        <li class="content-header-item"><a href="/posts/{{post.id}}/comments/">Comments</a></li>
+        {% if post.author.id == request.user.id %}
+            <li class="content-header-item right-align-text active"><a class="interest1" href="/posts/{{post.id}}/edit/"><b>Edit</b></a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="content height-1660 content-inner">
+    <div class="post">
+        <div class="content-inner">
+            <form id="edit-form" method="post" autocomplete="off" >
+                {% csrf_token %}
+                <input type="password" hidden />
+                <table>
+                    <tr>
+                        <td><p>Title</p></td>
+                        <td><input type="text" name="title" maxlength="100" value="{{ post.title }}"/></td>
+                        <td><p id="titleError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p>Tags</p></td>
+                        <td><input type="text" name="tags" maxlength="200" placeholder="Tag1; Tag2; Tag3" value="{% for i in post.tags.all %}{{ i.name }}; {% endfor %}" /></td>
+                        <td><p id="tagsError" class="interest0"></p></td>
+                    </tr>
+
+                    <tr>
+                        <td><p class="margin-top">Content</p></td>
+                        <td><textarea class="margin-top" name="content" placeholder="Allowed tags set: <p>, <a>, <i>, <b>, <s>, <br/>, <img/>, <li>, <ul>, <ol>. Every piece of text should inside <p> or <a> while <img/> and <br/> tags should have a closing slash." rows="20" cols="70">{{ post.content }}</textarea></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><input type="button" value="Confirm" class="usual bold" onClick="edit();" /></td>
+                        <td></td>
+                        <td><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><p id="contentError" class="interest0"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var editForm = document.getElementById("edit-form");
+    var inputs = editForm.getElementsByTagName("input");
+
+    for (var i = 0; i < inputs.length; i += 1) {
+        inputs[i].onkeypress = function (e) {
+            if (e.keyCode == 13) {
+                edit();
+            }
+        }
+    }
+
+    function edit() {
+        $.ajax({
+            dataType: "json",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            url: '/posts/{{post.id}}/edit/',
+            data: new FormData($('#edit-form')[0]),
+            success: function (response) {
+                if (response.result == 'ok') {
+                    window.location.href = response.message;
+                } else {
+                    var errors = ["titleError", "tagsError", "contentError" ];
+
+                    for (var i = 0; i < errors.length; i += 1) {
+                        if (response.result != errors[i]) {
+                            $('#' + errors[i]).text("Ok");
+                        } else {
+                            $('#' + errors[i]).text(response.message);
+                            for (var j = i + 1; j < errors.length; j += 1) {
+                                $('#' + errors[j]).text("");
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

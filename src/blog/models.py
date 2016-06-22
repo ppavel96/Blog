@@ -1,5 +1,4 @@
 ﻿from django.db import models
-from django.utils import timezone
 from django.db.models import Sum
 from django.db.models.functions import Coalesce, Value
 from blog.storage import OverwriteStorage
@@ -78,11 +77,6 @@ class Post(models.Model):
                  "author_id" : self.author.profile.id,
                  "blog_id" : self.blog.id }
 
-    # Publish
-
-    def publish(self):
-        self.publishedDate = timezone.now()
-        self.save()
 
     def __str__(self):
         return self.title
@@ -159,12 +153,6 @@ class Comment(models.Model):
 
                  'id' : self.id }
 
-    # Publish
-
-    def publish(self):
-        self.publishedDate = timezone.now()
-        self.save()
-
 
 class VoteForComment(models.Model):
     user = models.ForeignKey('auth.User')
@@ -232,10 +220,6 @@ class Blog(models.Model):
                  'cachedPostsNumber' : self.cachedPostsNumber,
 
                  'id' : self.id }
-
-    def publish(self):
-        self.publishedDate = timezone.now()
-        self.save()
 
     def __str__(self):
         return self.title

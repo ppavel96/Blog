@@ -155,13 +155,13 @@
 
 {% block scripts %}
 <script>
-    var registerForm = document.getElementById("edit-form");
-    var inputs = registerForm.getElementsByTagName("input");
+    var editForm = document.getElementById("edit-form");
+    var inputs = editForm.getElementsByTagName("input");
 
     for (var i = 0; i < inputs.length; i += 1) {
         inputs[i].onkeypress = function (e) {
             if (e.keyCode == 13) {
-                register();
+                edit();
             }
         }
     }
