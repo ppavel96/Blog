@@ -49,7 +49,7 @@ def comments(request, id = '0'):
     
         return page_404(request)
     else:
-        #try:
+        try:
             if request.user.is_authenticated():
                 content = request.POST.get('content').strip()
 
@@ -62,6 +62,9 @@ def comments(request, id = '0'):
                 post = Post.objects.all().get(id=id)
 
                 with transaction.atomic():
+                    request.user.profile.cachedCommentsNumber += 1
+                    request.user.profile.save()
+
                     post.cachedCommentsNumber += 1
                     post.save()
 
@@ -72,7 +75,7 @@ def comments(request, id = '0'):
             else:
                 return JsonResponse(['Error'], safe=False)
 
-       # except:
+        except:
             return JsonResponse(['Error'], safe=False)
 
 def post_edit(request, id = '0'):
