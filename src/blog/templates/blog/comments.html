@@ -56,6 +56,14 @@
     }
 
     function comment() {
+        if (!isAuthenticated()) {
+            modal.style.visibility = modalLoginContent.style.visibility = "visible";
+            modalLoginContent.classList.add("fadeout");
+            modal.classList.add("fadeout");
+
+            return;
+        }
+
         $.ajax({
             dataType: "json",
             type: "POST",

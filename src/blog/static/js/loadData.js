@@ -246,9 +246,9 @@ function constructComments(comments) {
 
 function voteForPost(btn, type, postId) {
     if (!isAuthenticated()) {
-        $("#modal").show();
-        $("#modal-login-content").show();
-        $("html, body").animate({ scrollTop: 0 }, "slow");
+        modal.style.visibility = modalLoginContent.style.visibility = "visible";
+        modalLoginContent.classList.add("fadeout");
+        modal.classList.add("fadeout");
 
         return;
     }
@@ -292,9 +292,9 @@ function voteForPost(btn, type, postId) {
 
 function voteForComment(btn, type, commentId) {
     if (!isAuthenticated()) {
-        $("#modal").show();
-        $("#modal-login-content").show();
-        $("html, body").animate({ scrollTop: 0 }, "slow");
+        modal.style.visibility = modalLoginContent.style.visibility = "visible";
+        modalLoginContent.classList.add("fadeout");
+        modal.classList.add("fadeout");
 
         return;
     }
@@ -338,9 +338,9 @@ function voteForComment(btn, type, commentId) {
 
 function subscribeForPost(btn, postId) {
     if (!isAuthenticated()) {
-        $("#modal").show();
-        $("#modal-login-content").show();
-        $("html, body").animate({ scrollTop: 0 }, "slow");
+        modal.style.visibility = modalLoginContent.style.visibility = "visible";
+        modalLoginContent.classList.add("fadeout");
+        modal.classList.add("fadeout");
 
         return;
     }
@@ -371,9 +371,9 @@ function subscribeForPost(btn, postId) {
 
 function subscribeForBlog(btn, blogId) {
     if (!isAuthenticated()) {
-        $("#modal").show();
-        $("#modal-login-content").show();
-        $("html, body").animate({ scrollTop: 0 }, "slow");
+        modal.style.visibility = modalLoginContent.style.visibility = "visible";
+        modalLoginContent.classList.add("fadeout");
+        modal.classList.add("fadeout");
 
         return;
     }
@@ -404,9 +404,9 @@ function subscribeForBlog(btn, blogId) {
 
 function subscribeForUser(btn, userId) {
     if (!isAuthenticated()) {
-        $("#modal").show();
-        $("#modal-login-content").show();
-        $("html, body").animate({ scrollTop: 0 }, "slow");
+        modal.style.visibility = modalLoginContent.style.visibility = "visible";
+        modalLoginContent.classList.add("fadeout");
+        modal.classList.add("fadeout");
 
         return;
     }
