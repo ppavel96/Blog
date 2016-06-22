@@ -116,14 +116,6 @@ class Comment(models.Model):
     content = models.TextField()
 
     publishedDate = models.DateTimeField(blank=True, null=True)
-
-    # Comment Path (up to 5 levels)
-
-    path0 = models.PositiveIntegerField(default=0)
-    path1 = models.PositiveIntegerField(default=0, null=True)
-    path2 = models.PositiveIntegerField(default=0, null=True)
-    path3 = models.PositiveIntegerField(default=0, null=True)
-    path4 = models.PositiveIntegerField(default=0, null=True)
     
     # Cached
 
@@ -135,23 +127,36 @@ class Comment(models.Model):
 
     # JSON
 
+    def get_vote(self, user):
+        result = 0
+
+        if user.is_authenticated() and VoteForComment.objects.filter(user=user, comment__id=self.id).count() > 0:
+            vote = VoteForComment.objects.get(user=user, comment__id=self.id)
+            result = vote.like
+
+        return result
+
     def to_JSON(self, user):
         return { 'author' : self.author.username,
-                 'post' : self.post,
+                 'post' : self.post.title,
+
+                 'image' : self.author.profile.image.url if self.author.profile.image else "",
+
+                 "vote" : self.get_vote(user),
+
+                 'author_id' : self.author.profile.id,
+                 'post_id' : self.post.id,
 
                  'content' : self.content,
 
                  'publishedDate' : self.publishedDate.isoformat(),
 
-                 'path0' : self.path0,
-                 'path1' : self.path1,
-                 'path2' : self.path2,
-                 'path3' : self.path3,
-                 'path4' : self.path4,
-
                  'cachedRating' : self.cachedRating,
 
                  'id' : self.id }
+
+    def __str__(self):
+        return self.author.username + ' in "' + self.post.title + '"';
 
 
 class VoteForComment(models.Model):

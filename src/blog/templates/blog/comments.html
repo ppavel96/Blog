@@ -14,12 +14,76 @@
     </ul>
 </nav>
 
-<div class="content height-1660 content-inner" id="comment_pool"></div>
+<div class="content height-1660 content-inner" id="comment_pool">
+    <div class="post">
+        <div class="content-inner">
+            <form id="comment-form" method="post" autocomplete="off" >
+                {% csrf_token %}
+                <input type="password" hidden />
+                <table>
+                    <tr>
+                        <td><p class="margin-top">Comment</p></td>
+                        <td><textarea class="margin-top" name="content" placeholder="Leave a comment (in markdown). Allowed tags set: <p>, <a>, <i>, <b>, <s>, <br/>, <img/>, <li>, <ul>, <ol>. Every piece of text should be inside <p> or <a> while <img/> and <br/> tags should have a closing slash." rows="3" cols="70"></textarea></td>
+                    </tr>
+
+                    <tr>
+                        <td><br /><br /><br /><br /><input type="button" value="Confirm" class="usual bold" onClick="comment();" /></td>
+                        <td></td>
+                        <td><br /><br /><br /><br /><p id="contentError" class="interest0 margin-left"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <hr /><hr class="margin-top"/>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script defer src="{%  static 'js/loadData.js' %}"></script>
 <script>
-    window.onload = function () {  }
+    window.onload = function () { loadComments({{ post.id }}); };
+
+    var commentForm = document.getElementById("comment-form");
+    var inputs = commentForm.getElementsByTagName("input");
+
+    for (var i = 0; i < inputs.length; i += 1) {
+        inputs[i].onkeypress = function (e) {
+            if (e.keyCode == 13) {
+                comment();
+            }
+        }
+    }
+
+    function comment() {
+        $.ajax({
+            dataType: "json",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            url: '/posts/{{post.id}}/comments/',
+            data: new FormData($('#comment-form')[0]),
+            success: function (response) {
+                if (response.result == 'ok') {
+                    window.location = window.location;
+                } else {
+                    var errors = ["contentError"];
+
+                    for (var i = 0; i < errors.length; i += 1) {
+                        if (response.result != errors[i]) {
+                            $('#' + errors[i]).text("Ok");
+                        } else {
+                            $('#' + errors[i]).text(response.message);
+                            for (var j = i + 1; j < errors.length; j += 1) {
+                                $('#' + errors[j]).text("");
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}

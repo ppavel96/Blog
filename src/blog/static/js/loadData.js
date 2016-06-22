@@ -80,6 +80,10 @@ function loadMembers(blog_id) {
     loadGeneric('/api/blogs.getFollowers', { count: 20, blog_id: blog_id }, constructUsers);
 }
 
+function loadComments(post_id) {
+    loadGeneric('/api/comments.getByPost', { count: 20, post_id : post_id }, constructComments);
+}
+
 function constructPosts(posts, comment_link) {
     for (var i = 0; i < posts.length; i += 1) {
         var timerID = "postPublishTime_" + posts[i].id;
@@ -196,6 +200,46 @@ function constructUsers(users) {
 
         $("#user_pool").append(text);
     }
+}
+
+function constructComments(comments) {
+    for (var i = 0; i < comments.length; i += 1) {
+        if (comments[i].image == "") {
+            comments[i].image = '/static/no_image.jpg';
+        }
+
+        var timerID = "commentPublishTime_" + comments[i].id;
+
+        timersToUpdate.push({
+            id: "#" + timerID,
+            time: new Date(comments[i].publishedDate)
+        });
+
+        var vote_data = comments[i].vote;
+        var upvote_icon = vote_data == 1 ? '/static/upvote_pressed.png' : '/static/upvote.png';
+        var downvote_icon = vote_data == -1 ? '/static/downvote_pressed.png' : '/static/downvote.png';
+
+        var text = '<div>' +
+                   '    <div class="table">' +
+                   '        <div class="table-cell content-inner">' +
+                   '            <img class="margin-top" src="' + comments[i].image + '" alt="User avatar" width="40" height="40" />' +
+                   '        </div>' +
+
+                   '        <div class="table-cell content-inner">' +
+                   '            <table><td><input class="vote" type="image" src="' + upvote_icon + '" alt="up" data-vote="' + vote_data + '" onclick="voteForComment(this, \'up\', ' + comments[i].id + ')" /><input class="vote" type="image" src="' + downvote_icon + '" alt="down" data-vote="' + vote_data + '" onclick="voteForComment(this, \'down\', ' + comments[i].id + ')" /></td>' +
+                   '            <td>' +
+                   '            <p class="tiny">' +
+                   '                <b class="interest0">Author:</b> <a class="usual" target="_blank" href="/profile/' + comments[i].author_id + '/">' + comments[i].author + '</a>; <b class="interest1">Rating:</b> <span id="comment-rating' + comments[i].id + '">' + comments[i].cachedRating + '</span>; <b  class="interest2">Published:</b> <span id="' + timerID + '"></span>' +
+                   '            </p>' +
+                   '            </td></table>' +
+                   '            <div class="margin-top">' + comments[i].content + '</div>' +
+                   '        </div>' +
+                   '    </div>' +
+                   '</div>' +
+                   '<hr>';
+
+        $("#comment_pool").append(text);
+    }
 
     timersUpdate();
 }
@@ -239,6 +283,52 @@ function voteForPost(btn, type, postId) {
         url: '/api/users.voteForPost',
         data: {
             post_id: postId,
+            user_id: getMyId(),
+            vote: btn.dataset.vote,
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+        }
+    });
+}
+
+function voteForComment(btn, type, commentId) {
+    if (!isAuthenticated()) {
+        $("#modal").show();
+        $("#modal-login-content").show();
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+        return;
+    }
+
+    var rating = parseInt($("#comment-rating" + commentId).text());
+    var prev = parseInt(btn.dataset.vote);
+
+    if (type == 'up') {
+        if (btn.dataset.vote == 1) {
+            btn.nextSibling.dataset.vote = btn.dataset.vote = 0;
+            btn.src = '/static/upvote.png';
+        } else {
+            btn.nextSibling.dataset.vote = btn.dataset.vote = 1;
+            btn.src = '/static/upvote_pressed.png';
+            btn.nextSibling.src = '/static/downvote.png';
+        }
+    } else {
+        if (btn.dataset.vote == -1) {
+            btn.previousSibling.dataset.vote = btn.dataset.vote = 0;
+            btn.src = '/static/downvote.png';
+        } else {
+            btn.previousSibling.dataset.vote = btn.dataset.vote = -1;
+            btn.src = '/static/downvote_pressed.png';
+            btn.previousSibling.src = '/static/upvote.png';
+        }
+    }
+
+    $("#comment-rating" + commentId).text(rating + parseInt(btn.dataset.vote) - prev);
+
+    $.ajax({
+        type: "POST",
+        url: '/api/users.voteForComment',
+        data: {
+            comment_id: commentId,
             user_id: getMyId(),
             vote: btn.dataset.vote,
             csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value

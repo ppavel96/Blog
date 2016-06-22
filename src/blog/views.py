@@ -43,10 +43,37 @@ def post_content(request, id = '0'):
     return page_404(request)
 
 def comments(request, id = '0'):
-    if Post.objects.filter(id=id).count() > 0:
-        return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id) })
+    if request.method == 'GET':
+        if Post.objects.filter(id=id).count() > 0:
+            return render(request, 'blog/comments.html', { 'navigation' : 'posts', 'tags' : Tag.objects.all().order_by('cachedTagNumber'), 'post' : Post.objects.get(id=id) })
     
-    return page_404(request)
+        return page_404(request)
+    else:
+        #try:
+            if request.user.is_authenticated():
+                content = request.POST.get('content').strip()
+
+                if len(content) == 0:
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Please, write something at least' }, safe=False)
+
+                if not validate(content):
+                    return JsonResponse({ 'result' : 'contentError',  'message' : 'Syntax error in comment' }, safe=False)
+            
+                post = Post.objects.all().get(id=id)
+
+                with transaction.atomic():
+                    post.cachedCommentsNumber += 1
+                    post.save()
+
+                    comment = Comment(post=post, content=content, author=request.user, publishedDate=timezone.now())
+                    comment.save()
+
+                return JsonResponse({ 'result' : 'ok' }, safe=False)
+            else:
+                return JsonResponse(['Error'], safe=False)
+
+       # except:
+            return JsonResponse(['Error'], safe=False)
 
 def post_edit(request, id = '0'):
     if request.method == 'GET':
@@ -801,20 +828,27 @@ def users_getById(request):
 
 def comments_get(request):
     try:
-        return JsonResponse(to_JSON(request, filter_comments(request, Comment.objects.all().order_by('cachedRating'))), safe=False)
+        return JsonResponse(to_JSON(request, filter_comments(request, Comment.objects.all().order_by('-cachedRating'))), safe=False)
 
     except:
         return JsonResponse(['Error'], safe=False)
 
 
 def comments_getByPost(request):
-    pass
+    try:
+        post = Post.objects.get(id=request.GET.get('post_id', ''))
+        array = post.comment_set.all().order_by('-publishedDate')
+
+        return JsonResponse(to_JSON(request, filter_comments(request, array)), safe=False)
+
+    except:
+        return JsonResponse(['Error'], safe=False)
 
 
 def comments_getByUser(request):
     try:
         user = Profile.objects.get(id=request.GET.get('user_id', ''))
-        array = user.comment_set.all()
+        array = user.comment_set.all().order_by('-publishedDate')
 
         return JsonResponse(to_JSON(request, filter_comments(request, array)), safe=False)
 
@@ -1024,7 +1058,35 @@ def users_voteForPost(request):
 
 
 def users_voteForComment(request):
-    pass
+    if request.method == 'POST':
+        try:
+            comment = Comment.objects.get(id=request.POST.get('comment_id', ''))
+            user = Profile.objects.get(id=request.POST.get('user_id', ''))
+            like = int(request.POST.get('vote', '0'))
+
+            like = max(-1, min(1, like))
+
+            if VoteForComment.objects.filter(user__profile=user, comment=comment).count() > 0:
+                vote = VoteForComment.objects.get(user__profile=user, comment=comment)
+                prev_like = vote.like
+                vote.like = like
+            else:
+                prev_like = 0
+                vote = VoteForComment(user=user.user, comment=comment, like=like)
+
+            comment.cachedRating += like - prev_like
+            comment.author.profile.cachedUserRating += like - prev_like
+
+            comment.save()
+            comment.author.profile.save()
+            vote.save()
+
+            return JsonResponse({'result': 'ok'})
+
+        except:
+            return JsonResponse(['Error'], safe=False)
+
+    return page_404(request)
 
 
 # 404 page

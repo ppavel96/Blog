@@ -25,6 +25,6 @@
 {% block scripts %}
 <script defer src="{%  static 'js/loadData.js' %}"></script>
 <script>
-    window.onscroll = window.onload = function () { loadMembers({{ blog.id }}); }
+    window.onscroll = window.onload = function () { loadMembers({{ blog.id }}); };
 </script>
 {% endblock %}
